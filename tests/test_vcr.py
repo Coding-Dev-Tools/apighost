@@ -1,0 +1,85 @@
+"""Tests for VCR cassette module."""
+
+import json
+import tempfile
+from pathlib import Path
+
+import pytest
+
+from apighost.vcr import (
+    Recorder, save_cassette, load_cassette, list_cassettes, CassetteInteraction
+)
+from apighost.schema import Cassette
+
+
+def test_recorder_basic():
+    """Test basic recording."""
+    r = Recorder()
+    r.record("GET", "/api/users", {}, None, 200, {}, '[{"id":1}]')
+    assert r.count == 1
+    assert r.interactions[0].request_method == "GET"
+    assert r.interactions[0].response_status == 200
+
+
+def test_recorder_multiple():
+    """Test recording multiple interactions."""
+    r = Recorder()
+    r.record("GET", "/users", {}, None, 200, {}, "[]")
+    r.record("POST", "/users", {}, '{"name":"test"}', 201, {}, '{"id":1}')
+    r.record("DELETE", "/users/1", {}, None, 204, {}, "")
+    assert r.count == 3
+
+
+def test_recorder_clear():
+    """Test clearing a recorder."""
+    r = Recorder()
+    r.record("GET", "/test", {}, None, 200, {}, "")
+    assert r.count == 1
+    r.clear()
+    assert r.count == 0
+
+
+def test_recorder_strips_sensitive_headers():
+    """Test that sensitive headers are stripped from recording."""
+    r = Recorder()
+    r.record("GET", "/secure", {"Authorization": "Bearer xxx", "X-Custom": "ok"},
+             None, 200, {}, "")
+    recorded = r.interactions[0]
+    assert "authorization" not in recorded.request_headers
+    assert "Authorization" not in recorded.request_headers
+    assert recorded.request_headers.get("X-Custom") == "ok"
+
+
+def test_save_and_load_cassette():
+    """Test roundtrip save/load cassette."""
+    r = Recorder()
+    r.record("GET", "/test", {}, None, 200, {}, '"ok"')
+    path = r.save("test-cassette", "/path/to/spec.yaml")
+    assert path is not None
+
+    loaded = load_cassette("test-cassette")
+    assert loaded.name == "test-cassette"
+    assert len(loaded.interactions) == 1
+    assert loaded.interactions[0].request_method == "GET"
+    assert loaded.interactions[0].response_body == '"ok"'
+
+
+def test_load_nonexistent_cassette():
+    """Test loading a nonexistent cassette raises."""
+    with pytest.raises(FileNotFoundError):
+        load_cassette("nonexistent-cassette-12345")
+
+
+def test_cassette_interaction_dataclass():
+    """Test CassetteInteraction data class."""
+    ci = CassetteInteraction(
+        request_method="POST",
+        request_path="/items",
+        request_headers={"Content-Type": "application/json"},
+        request_body='{"name":"test"}',
+        response_status=201,
+        response_headers={"Location": "/items/1"},
+        response_body='{"id":1}',
+    )
+    assert ci.request_method == "POST"
+    assert ci.response_status == 201
