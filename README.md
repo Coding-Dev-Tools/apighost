@@ -1,6 +1,10 @@
 # APIGhost
 
+[![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/apighost?style=social)](https://github.com/Coding-Dev-Tools/apighost/stargazers)
+
 **OpenAPI spec → mock server with VCR recording**
+
+> ⭐ **Star this repo** if you build or test APIs — it helps others discover APIGhost!
 
 [![PyPI](https://img.shields.io/pypi/v/apighost)](https://pypi.org/project/apighost/)
 [![Python](https://img.shields.io/pypi/pyversions/apighost)](https://pypi.org/project/apighost/)
