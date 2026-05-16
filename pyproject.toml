@@ -31,6 +31,7 @@ dependencies = [
     "requests>=2.31.0",
     "jsonschema>=4.17.0",
     "werkzeug>=3.0.0",
+    "revenueholdings-license>=0.1.0",
 ]
 
 [project.optional-dependencies]
