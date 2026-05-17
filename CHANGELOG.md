@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.1.0 (unreleased)
+## v0.1.0
 
 - Initial release
 - OpenAPI 3.0/3.1 spec parsing

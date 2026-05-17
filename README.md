@@ -9,7 +9,7 @@
 [![PyPI](https://img.shields.io/badge/PyPI-Coming_Soon-grey?logo=pypi)](https://pypi.org/project/apighost/)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Coding-Dev-Tools/apighost/blob/main/LICENSE)
-[![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/test.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/test.yml)
+[![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/apighost)
 [![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/apighost)
 [![Awesome Python](https://img.shields.io/badge/Awesome_Python-%E2%87%92-blue?logo=python)](https://github.com/uhub/awesome-python)

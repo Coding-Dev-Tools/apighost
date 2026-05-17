@@ -1,9 +1,10 @@
 """Fake data generation from OpenAPI schemas using Faker."""
 
 from __future__ import annotations
+
 import random
-from typing import Any
 from faker import Faker
+from typing import Any
 
 _faker = Faker()
 
