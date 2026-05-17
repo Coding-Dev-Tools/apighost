@@ -1,14 +1,12 @@
 """Tests for the mock server."""
 
 import json
-
 import pytest
-
 from apighost.parser import parse_spec
+from apighost.scenario import Scenario
+from apighost.schema import ApiSpec
 from apighost.server import create_app
 from apighost.vcr import Recorder
-from apighost.scenario import Scenario
-from apighost.schema import Endpoint, ApiSpec
 
 from . import PETSTORE_YAML
 

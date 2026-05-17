@@ -1,9 +1,7 @@
 """Tests for scenario management."""
 
 import pytest
-
-from apighost.scenario import save_scenario, load_scenario, list_scenarios, delete_scenario
-from apighost.schema import Scenario
+from apighost.scenario import delete_scenario, list_scenarios, load_scenario, save_scenario
 
 
 def test_save_and_load_scenario():

@@ -2,13 +2,8 @@
 
 import json
 import tempfile
+from apighost.parser import _infer_type, get_param_pattern, parse_spec
 from pathlib import Path
-
-import pytest
-import yaml
-
-from apighost.parser import parse_spec, load_spec, _infer_type, get_param_pattern
-from apighost.schema import ApiSpec, Endpoint
 
 from . import PETSTORE_YAML
 

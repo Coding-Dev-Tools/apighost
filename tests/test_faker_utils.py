@@ -1,6 +1,6 @@
 """Tests for fake data generation."""
 
-from apighost.faker_utils import generate_value, generate_status_code, PROPERTY_HINTS
+from apighost.faker_utils import generate_status_code, generate_value
 
 
 def test_generate_string():

@@ -1,15 +1,8 @@
 """Tests for VCR cassette module."""
 
-import json
-import tempfile
-from pathlib import Path
 
 import pytest
-
-from apighost.vcr import (
-    Recorder, save_cassette, load_cassette, list_cassettes, CassetteInteraction
-)
-from apighost.schema import Cassette
+from apighost.vcr import CassetteInteraction, Recorder, load_cassette
 
 
 def test_recorder_basic():
