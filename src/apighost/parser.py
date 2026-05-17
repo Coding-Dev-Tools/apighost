@@ -1,12 +1,12 @@
 """OpenAPI 3.0/3.1 spec parser for APIGhost."""
 
 from __future__ import annotations
+
 import json
 import re
+import yaml
 from pathlib import Path
 from typing import Any
-
-import yaml
 
 from .schema import ApiSpec, Endpoint, Parameter, Response
 

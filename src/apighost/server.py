@@ -1,17 +1,16 @@
 """Mock HTTP server generated from OpenAPI spec."""
 
 from __future__ import annotations
+
 import json
 import logging
 import re
-import threading
+from flask import Flask, Response, jsonify, request
 from typing import Any
 
-from flask import Flask, Response, request, jsonify
-
-from .schema import ApiSpec, Endpoint, Scenario
-from .faker_utils import generate_value, generate_status_code
+from .faker_utils import generate_status_code, generate_value
 from .parser import get_param_pattern
+from .schema import ApiSpec, Endpoint, Scenario
 
 logger = logging.getLogger(__name__)
 

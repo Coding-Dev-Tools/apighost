@@ -1,13 +1,10 @@
 """VCR-style cassette recording and replay for APIGhost."""
 
 from __future__ import annotations
+
 import json
-import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
-
-import yaml
 
 from .schema import Cassette, CassetteInteraction
 

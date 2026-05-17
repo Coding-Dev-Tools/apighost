@@ -1,22 +1,19 @@
 """APIGhost CLI entry point â€” OpenAPI spec to mock server."""
 
 from __future__ import annotations
+
+import click
 import json
-import os
-import signal
 import sys
 import time
 from pathlib import Path
 
-import click
-import yaml
-
 from . import __version__
-from .parser import parse_spec
-from .server import create_app
-from .vcr import list_cassettes, load_cassette, save_cassette, Recorder
-from .scenario import list_scenarios, load_scenario, save_scenario, delete_scenario
 from .faker_utils import generate_value
+from .parser import parse_spec
+from .scenario import delete_scenario, list_scenarios, load_scenario, save_scenario
+from .server import create_app
+from .vcr import Recorder, list_cassettes, load_cassette
 
 try:
     from revenueholdings_license import require_license
@@ -134,8 +131,8 @@ def record(spec, output, port, requests):
     This fires sample requests against the mock server to capture
     realistic interactions for later replay.
     """
-    import threading
     import requests as http_requests
+    import threading
 
     api_spec = parse_spec(spec)
     recorder = Recorder()
@@ -204,7 +201,8 @@ def replay(cassette, port, host):
     if cassette_data.spec_path:
         click.echo(f"   Original spec: {cassette_data.spec_path}")
 
-    from flask import Flask, jsonify, request as flask_request
+    from flask import Flask, jsonify
+    from flask import request as flask_request
 
     app = Flask(__name__)
 
@@ -332,7 +330,7 @@ def scenario_edit(name, route, status, body):
             parsed_body = body
 
     sc.overrides[route] = {"status": status, "body": parsed_body}
-    path = save_scenario(sc.name, sc.description, sc.overrides)
+    save_scenario(sc.name, sc.description, sc.overrides)
     click.echo(f" Updated scenario '{name}' â€” overrides: {len(sc.overrides)}")
 
 
