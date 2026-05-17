@@ -32,8 +32,12 @@ def cli():
     Turn any OpenAPI 3.0/3.1 spec into a running mock server
     with realistic fake data and VCR-style recording/replay.
     """
-    from revenueholdings_license import require_license
-    require_license("apighost")
+    try:
+        from revenueholdings_license import require_license
+        require_license("apighost")
+    except ImportError:
+        import warnings
+        warnings.warn("revenueholdings-license not installed; license checks skipped", stacklevel=2)
 
 
 @cli.command()
