@@ -21,26 +21,24 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "click>=8.1.0",
-    "pyyaml>=6.0",
-    "faker>=18.0.0",
-    "flask>=3.0.0",
-    "rich>=13.0.0",
-    "requests>=2.31.0",
-    "jsonschema>=4.17.0",
-    "werkzeug>=3.0.0",
+  "click>=8.1.0",
+  "pyyaml>=6.0",
+  "faker>=18.0.0",
+  "flask>=3.0.0",
+  "requests>=2.31.0",
+  "werkzeug>=3.0.0",
 ]
 
 [project.optional-dependencies]
-license = ["revenueholdings-license>=0.1.0"]
+licensing = ["revenueholdings-license>=0.1.0"]
 dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "httpx>=0.27.0",
+  "pytest>=7.0.0",
+  "pytest-cov>=4.0.0",
+  "httpx>=0.27.0",
 ]
-license = ["revenueholdings-license>=0.1.0"]
 
 [project.scripts]
 apighost = "apighost.cli:cli"

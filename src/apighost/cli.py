@@ -2,26 +2,22 @@
 
 from __future__ import annotations
 import json
-import os
-import signal
+import re
 import sys
 import time
 from pathlib import Path
 
 import click
-import yaml
 
 from . import __version__
 from .parser import parse_spec
 from .server import create_app
-from .vcr import list_cassettes, load_cassette, save_cassette, Recorder
+from .vcr import list_cassettes, load_cassette, Recorder
 from .scenario import list_scenarios, load_scenario, save_scenario, delete_scenario
 from .faker_utils import generate_value
 
 
-# Global recorder reference for signal handler
 _current_recorder: Recorder | None = None
-_current_server_thread = None
 
 
 @click.group()
@@ -156,8 +152,6 @@ def record(spec, output, port, requests):
         if count >= requests:
             break
         url = f"http://127.0.0.1:{port}{ep.path}"
-        # Fill path params with fake values
-        import re
         filled_path = ep.path
         for match in re.finditer(r"\{(\w+)\}", ep.path):
             param_name = match.group(1)
