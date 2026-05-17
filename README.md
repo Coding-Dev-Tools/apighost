@@ -10,11 +10,8 @@
 [![Python](https://img.shields.io/pypi/pyversions/apighost)](https://pypi.org/project/apighost/)
 [![License](https://img.shields.io/pypi/l/apighost)](https://github.com/Coding-Dev-Tools/apighost/blob/main/LICENSE)
 [![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/test.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/test.yml)
-[![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/apighost)
-[![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/apighost)
-[![Awesome Python](https://img.shields.io/badge/Awesome_Python-%E2%87%92-blue?logo=python)](https://github.com/uhub/awesome-python)
 
-Turn any OpenAPI 3.0/3.1 spec into a running mock API server with realistic fake data
+Turn any OpenAPI 3.0/3.1 spec into a running mock API server with realistic fake data, scenario-based response overrides, and VCR-style cassette recording/replay.
 
 ## Why APIGhost?
 
