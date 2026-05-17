@@ -1,27 +1,22 @@
-"""APIGhost CLI entry point â€” OpenAPI spec to mock server."""
+"""APIGhost CLI entry point — OpenAPI spec to mock server."""
 
 from __future__ import annotations
-
-import click
 import json
+import os
+import signal
 import sys
 import time
 from pathlib import Path
 
-from . import __version__
-from .faker_utils import generate_value
-from .parser import parse_spec
-from .scenario import delete_scenario, list_scenarios, load_scenario, save_scenario
-from .server import create_app
-from .vcr import Recorder, list_cassettes, load_cassette
+import click
+import yaml
 
-try:
-    from revenueholdings_license import require_license
-except ImportError:
-    def require_license(tool):
-        def decorator(func):
-            return func
-        return decorator
+from . import __version__
+from .parser import parse_spec
+from .server import create_app
+from .vcr import list_cassettes, load_cassette, save_cassette, Recorder
+from .scenario import list_scenarios, load_scenario, save_scenario, delete_scenario
+from .faker_utils import generate_value
 
 
 # Global recorder reference for signal handler
@@ -32,12 +27,17 @@ _current_server_thread = None
 @click.group()
 @click.version_option(__version__, prog_name="apighost")
 def cli():
-    """APIGhost - OpenAPI spec to mock server with VCR recording.
+    """APIGhost — OpenAPI spec to mock server with VCR recording.
 
     Turn any OpenAPI 3.0/3.1 spec into a running mock server
     with realistic fake data and VCR-style recording/replay.
     """
-    require_license("apighost")
+    try:
+        from revenueholdings_license import require_license
+        require_license("apighost")
+    except ImportError:
+        import warnings
+        warnings.warn("revenueholdings-license not installed; license checks skipped", stacklevel=2)
 
 
 @cli.command()
@@ -59,7 +59,7 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch):
         apighost serve spec.yaml --scenario error_400
         apighost serve spec.yaml --record --cassette-name my-test
     """
-    click.echo(f" APIGhost v{__version__} â€” loading spec...")
+    click.echo(f" APIGhost v{__version__} — loading spec...")
     click.echo(f"   Spec: {spec}")
 
     try:
@@ -113,10 +113,10 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch):
 
 
 def _on_shutdown(recorder, cassette_name, spec_path):
-    """Handle server shutdown â€” save cassette if recording."""
+    """Handle server shutdown — save cassette if recording."""
     if recorder and recorder.count > 0:
         path = recorder.save(cassette_name or f"recording-{int(time.time())}", spec_path)
-        click.echo(f"\n Recorded {recorder.count} interactions â†’ {path}")
+        click.echo(f"\n Recorded {recorder.count} interactions → {path}")
     click.echo("\n Server stopped.")
 
 
@@ -131,8 +131,8 @@ def record(spec, output, port, requests):
     This fires sample requests against the mock server to capture
     realistic interactions for later replay.
     """
-    import requests as http_requests
     import threading
+    import requests as http_requests
 
     api_spec = parse_spec(spec)
     recorder = Recorder()
@@ -169,14 +169,14 @@ def record(spec, output, port, requests):
             click.echo(f"   {ep.method:>6} {resp.status_code} {filled_path}")
             count += 1
         except Exception as e:
-            click.echo(f"   {ep.method:>6} ERROR {filled_path} â€” {e}")
+            click.echo(f"   {ep.method:>6} ERROR {filled_path} — {e}")
 
     # Determine output
     if not output:
         output = f"cassette-{api_spec.title.replace(' ', '-').lower()}-{int(time.time())}"
 
     path = recorder.save(output, spec)
-    click.echo(f"\n Recorded {recorder.count} interactions â†’ {path}")
+    click.echo(f"\n Recorded {recorder.count} interactions → {path}")
     return path
 
 
@@ -196,13 +196,12 @@ def replay(cassette, port, host):
         click.echo(f" Error: {e}", err=True)
         sys.exit(1)
 
-    click.echo(f" APIGhost â€” replaying cassette: {cassette_data.name}")
+    click.echo(f" APIGhost — replaying cassette: {cassette_data.name}")
     click.echo(f"   Interactions: {len(cassette_data.interactions)}")
     if cassette_data.spec_path:
         click.echo(f"   Original spec: {cassette_data.spec_path}")
 
-    from flask import Flask, jsonify
-    from flask import request as flask_request
+    from flask import Flask, jsonify, request as flask_request
 
     app = Flask(__name__)
 
@@ -224,7 +223,7 @@ def replay(cassette, port, host):
     @app.route("/")
     def _replay_home():
         return jsonify({
-            "service": f"APIGhost Replay â€” {cassette_data.name}",
+            "service": f"APIGhost Replay — {cassette_data.name}",
             "interactions": len(cassette_data.interactions),
             "endpoints": list(set(f"{i.request_method} {i.request_path}"
                                   for i in cassette_data.interactions)),
@@ -275,7 +274,7 @@ def cassette_info(name):
     click.echo()
     for i, interaction in enumerate(data.interactions, 1):
         click.echo(f"  {i}. {interaction.request_method} {interaction.request_path}")
-        click.echo(f"     â†’ {interaction.response_status}")
+        click.echo(f"     → {interaction.response_status}")
 
 
 @cli.group()
@@ -303,7 +302,7 @@ def scenario_list():
 def scenario_create(name, description):
     """Create a new empty scenario."""
     path = save_scenario(name, description)
-    click.echo(f" Created scenario '{name}' â†’ {path}")
+    click.echo(f" Created scenario '{name}' → {path}")
 
 
 @scenario.command("edit")
@@ -330,8 +329,8 @@ def scenario_edit(name, route, status, body):
             parsed_body = body
 
     sc.overrides[route] = {"status": status, "body": parsed_body}
-    save_scenario(sc.name, sc.description, sc.overrides)
-    click.echo(f" Updated scenario '{name}' â€” overrides: {len(sc.overrides)}")
+    path = save_scenario(sc.name, sc.description, sc.overrides)
+    click.echo(f" Updated scenario '{name}' — overrides: {len(sc.overrides)}")
 
 
 @scenario.command("delete")
@@ -366,7 +365,7 @@ def generate(spec, output, name):
         click.echo(f"   {ep.method:<6} {ep.path}")
 
     path = save_scenario(scenario_name, f"Auto-generated from {spec}", overrides)
-    click.echo(f"\n Generated {len(overrides)} endpoint responses â†’ {path}")
+    click.echo(f"\n Generated {len(overrides)} endpoint responses → {path}")
 
 
 @cli.command()
@@ -385,4 +384,3 @@ def info():
 
 if __name__ == "__main__":
     cli()
-
