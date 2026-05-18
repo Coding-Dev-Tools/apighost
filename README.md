@@ -1,10 +1,10 @@
-﻿# APIGhost
+# APIGhost
 
 [![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/apighost?style=social)](https://github.com/Coding-Dev-Tools/apighost/stargazers)
 
-**OpenAPI spec â†’ mock server with VCR recording**
+**OpenAPI spec → mock server with VCR recording**
 
-> â­ **Star this repo** if you build or test APIs â€” it helps others discover APIGhost!
+> ⭐ **Star this repo** if you build or test APIs — it helps others discover APIGhost!
 
 [![PyPI](https://img.shields.io/pypi/v/apighost)](https://pypi.org/project/apighost/)
 [![Python](https://img.shields.io/pypi/pyversions/apighost)](https://pypi.org/project/apighost/)
@@ -18,7 +18,7 @@ Turn any OpenAPI 3.0/3.1 spec into a running mock API server
 
 ## Why APIGhost?
 
-Every frontend and integration test needs a mock API. Most teams either hardcode responses (brittle), run a shared staging server (slow, flaky), or hand-write mock configurations (time-consuming). APIGhost reads your OpenAPI spec and **generates a working mock server in seconds** â€” with realistic fake data, scenario switching for edge cases, and VCR recording for deterministic test replay. When your API spec changes, your mock server updates automatically.
+Every frontend and integration test needs a mock API. Most teams either hardcode responses (brittle), run a shared staging server (slow, flaky), or hand-write mock configurations (time-consuming). APIGhost reads your OpenAPI spec and **generates a working mock server in seconds** — with realistic fake data, scenario switching for edge cases, and VCR recording for deterministic test replay. When your API spec changes, your mock server updates automatically.
 
 ## Installation
 
@@ -78,7 +78,7 @@ apighost replay /path/to/cassette.json -p 3000
 ```
 
 ### `apighost scenario`
-Manage response scenarios â€” named sets of overrides.
+Manage response scenarios — named sets of overrides.
 
 ```bash
 apighost scenario create error-test -d "API error scenarios"
@@ -99,12 +99,12 @@ Show APIGhost configuration and storage info.
 
 ## Features
 
-- **OpenAPI 3.0/3.1 parsing** â€” full path, parameter, and response parsing
-- **Realistic fake data** â€” Faker-powered with property name hints (emails, names, IDs)
-- **VCR recording** â€” capture real interactions for deterministic replay
-- **Scenario system** â€” named response presets for testing edge cases
-- **Path parameter support** â€” dynamic URL path resolution
-- **Status code selection** â€” picks appropriate response codes per scenario
+- **OpenAPI 3.0/3.1 parsing** — full path, parameter, and response parsing
+- **Realistic fake data** — Faker-powered with property name hints (emails, names, IDs)
+- **VCR recording** — capture real interactions for deterministic replay
+- **Scenario system** — named response presets for testing edge cases
+- **Path parameter support** — dynamic URL path resolution
+- **Status code selection** — picks appropriate response codes per scenario
 
 ## CI/CD Integration
 
@@ -129,13 +129,13 @@ apighost replay my-recording -p 8080            # Replay forever, same responses
 
 | Feature | APIGhost | Prism | WireMock | Mockoon |
 |---------|----------|-------|----------|---------|
-| OpenAPI → mock server | ✅ | ✅ | ❌ | ✅ |
-| VCR record/replay | ✅ | ❌ | ✅ | ❌ |
-| Scenario switching | ✅ | ❌ | ✅ | ✅ |
-| Realistic fake data | ✅ | ✅ | ❌ | ❌ |
-| Zero-config from spec | ✅ | ✅ | ❌ | ✅ |
-| CLI-first (no GUI) | ✅ | ✅ | ✅ | ❌ |
-| Spec change auto-sync | ✅ | ✅ | ❌ | ❌ |
+| OpenAPI ? mock server | ? | ? | ? | ? |
+| VCR record/replay | ? | ? | ? | ? |
+| Scenario switching | ? | ? | ? | ? |
+| Realistic fake data | ? | ? | ? | ? |
+| Zero-config from spec | ? | ? | ? | ? |
+| CLI-first (no GUI) | ? | ? | ? | ? |
+| Spec change auto-sync | ? | ? | ? | ? |
 
 **APIGhost vs Prism**: Prism generates mock responses but can't record/replay or switch scenarios. APIGhost adds VCR cassettes and scenario presets.
 
@@ -149,13 +149,13 @@ apighost replay my-recording -p 8080            # Replay forever, same responses
 |------|-------|----------|
 | **Free** | $0 | Unlimited local use, 100 requests/session |
 | **Pro** | $12/mo ($119/yr) | Unlimited requests, VCR cassettes, CI/CD integration |
-| **Suite** | $49/mo ($499/yr) | All 10 Revenue Holdings tools under one license |
+| **Suite** | $49/mo ($499/yr) | All 10 DevForge tools under one license |
 
 ## Storage
 
 Cassettes and scenarios are stored in `~/.apighost/`:
-- `~/.apighost/cassettes/` â€” recorded interaction cassettes (JSON)
-- `~/.apighost/scenarios/` â€” response scenario definitions (JSON)
+- `~/.apighost/cassettes/` — recorded interaction cassettes (JSON)
+- `~/.apighost/scenarios/` — response scenario definitions (JSON)
 
 ## Roadmap
 
@@ -177,9 +177,9 @@ pytest
 
 ## License
 
-MIT â€” see [LICENSE](LICENSE)
+MIT — see [LICENSE](LICENSE)
 
 ---
 
-<sub>Part of [Revenue Holdings](https://coding-dev-tools.github.io/revenueholdings.dev/) â€” a suite of 10 developer CLI tools built by autonomous AI agents. Also check out [API Contract Guardian](https://github.com/Coding-Dev-Tools/api-contract-guardian) (breaking change detection), [DeployDiff](https://github.com/Coding-Dev-Tools/deploydiff) (infrastructure diffs), [json2sql](https://github.com/Coding-Dev-Tools/json2sql) (JSON â†’ SQL), [ConfigDrift](https://github.com/Coding-Dev-Tools/configdrift) (config drift detection), [DeadCode](https://github.com/Coding-Dev-Tools/deadcode) (dead code cleanup), [APIAuth](https://github.com/Coding-Dev-Tools/apiauth) (API key management), [Envault](https://github.com/Coding-Dev-Tools/envault) (env sync), [SchemaForge](https://github.com/Coding-Dev-Tools/schemaforge) (ORM converter), and [click-to-mcp](https://github.com/Coding-Dev-Tools/click-to-mcp) (CLI â†’ MCP server).</sub>
+<sub>Part of [DevForge](https://coding-dev-tools.github.io/devforge.dev/) — a suite of 10 developer CLI tools built by autonomous AI agents. Also check out [API Contract Guardian](https://github.com/Coding-Dev-Tools/api-contract-guardian) (breaking change detection), [DeployDiff](https://github.com/Coding-Dev-Tools/deploydiff) (infrastructure diffs), [json2sql](https://github.com/Coding-Dev-Tools/json2sql) (JSON → SQL), [ConfigDrift](https://github.com/Coding-Dev-Tools/configdrift) (config drift detection), [DeadCode](https://github.com/Coding-Dev-Tools/deadcode) (dead code cleanup), [APIAuth](https://github.com/Coding-Dev-Tools/apiauth) (API key management), [Envault](https://github.com/Coding-Dev-Tools/envault) (env sync), [SchemaForge](https://github.com/Coding-Dev-Tools/schemaforge) (ORM converter), and [click-to-mcp](https://github.com/Coding-Dev-Tools/click-to-mcp) (CLI → MCP server).</sub>
 
