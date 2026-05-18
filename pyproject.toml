@@ -10,7 +10,6 @@ readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "Revenue Holdings"}]
-urls = {Homepage = "https://github.com/Coding-Dev-Tools/apighost", Repository = "https://github.com/Coding-Dev-Tools/apighost"}
 keywords = ["openapi", "mock", "api", "vcr", "testing", "stub"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -41,6 +40,13 @@ dev = [
     "pytest-cov>=4.0.0",
     "httpx>=0.27.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Coding-Dev-Tools/apighost"
+Documentation = "https://coding-dev-tools.github.io/apighost"
+Repository = "https://github.com/Coding-Dev-Tools/apighost"
+Issues = "https://github.com/Coding-Dev-Tools/apighost/issues"
+Changelog = "https://github.com/Coding-Dev-Tools/apighost/releases"
 
 [project.scripts]
 apighost = "apighost.cli:cli"
