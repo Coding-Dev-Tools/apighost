@@ -9,7 +9,7 @@
 [![PyPI](https://img.shields.io/pypi/v/apighost)](https://pypi.org/project/apighost/)
 [![Python](https://img.shields.io/pypi/pyversions/apighost)](https://pypi.org/project/apighost/)
 [![License](https://img.shields.io/pypi/l/apighost)](https://github.com/Coding-Dev-Tools/apighost/blob/main/LICENSE)
-[![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/test.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/test.yml)
+[![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/apighost)
 [![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/apighost)
 [![Awesome Python](https://img.shields.io/badge/Awesome_Python-%E2%87%92-blue?logo=python)](https://github.com/uhub/awesome-python)
@@ -149,7 +149,7 @@ apighost replay my-recording -p 8080            # Replay forever, same responses
 |------|-------|----------|
 | **Free** | $0 | Unlimited local use, 100 requests/session |
 | **Pro** | $12/mo ($119/yr) | Unlimited requests, VCR cassettes, CI/CD integration |
-| **Suite** | $49/mo ($499/yr) | All 10 DevForge tools under one license |
+| **Suite** | $49/mo ($499/yr) | All 11 DevForge tools under one license |
 
 ## Storage
 
@@ -181,5 +181,5 @@ MIT — see [LICENSE](LICENSE)
 
 ---
 
-<sub>Part of [DevForge](https://coding-dev-tools.github.io/devforge.dev/) — a suite of 10 developer CLI tools built by autonomous AI agents. Also check out [API Contract Guardian](https://github.com/Coding-Dev-Tools/api-contract-guardian) (breaking change detection), [DeployDiff](https://github.com/Coding-Dev-Tools/deploydiff) (infrastructure diffs), [json2sql](https://github.com/Coding-Dev-Tools/json2sql) (JSON → SQL), [ConfigDrift](https://github.com/Coding-Dev-Tools/configdrift) (config drift detection), [DeadCode](https://github.com/Coding-Dev-Tools/deadcode) (dead code cleanup), [APIAuth](https://github.com/Coding-Dev-Tools/apiauth) (API key management), [Envault](https://github.com/Coding-Dev-Tools/envault) (env sync), [SchemaForge](https://github.com/Coding-Dev-Tools/schemaforge) (ORM converter), and [click-to-mcp](https://github.com/Coding-Dev-Tools/click-to-mcp) (CLI → MCP server).</sub>
+<sub>Part of [DevForge](https://coding-dev-tools.github.io/revenueholdings.dev/) — a suite of 11 developer CLI tools built by autonomous AI agents. Also check out [DataMorph](https://github.com/Coding-Dev-Tools/datamorph) (data format conversion), [DevForge](https://github.com/Coding-Dev-Tools/devforge) (unified CLI), [API Contract Guardian](https://github.com/Coding-Dev-Tools/api-contract-guardian) (breaking change detection), [DeployDiff](https://github.com/Coding-Dev-Tools/deploydiff) (infrastructure diffs), [json2sql](https://github.com/Coding-Dev-Tools/json2sql) (JSON → SQL), [ConfigDrift](https://github.com/Coding-Dev-Tools/configdrift) (config drift detection), [DeadCode](https://github.com/Coding-Dev-Tools/deadcode) (dead code cleanup), [APIAuth](https://github.com/Coding-Dev-Tools/apiauth) (API key management), [Envault](https://github.com/Coding-Dev-Tools/envault) (env sync), [SchemaForge](https://github.com/Coding-Dev-Tools/schemaforge) (ORM converter), and [click-to-mcp](https://github.com/Coding-Dev-Tools/click-to-mcp) (CLI → MCP server).</sub>
 
