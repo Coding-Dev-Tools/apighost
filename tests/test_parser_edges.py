@@ -2,6 +2,8 @@
 
 import json
 import tempfile
+from pathlib import Path
+
 from apighost.parser import (
     _extract_example,
     _infer_type,
@@ -13,7 +15,6 @@ from apighost.parser import (
     load_spec,
     parse_spec,
 )
-from pathlib import Path
 
 # --- _resolve_ref edge cases ---
 
