@@ -6,13 +6,10 @@
 
 > ⭐ **Star this repo** if you build or test APIs — it helps others discover APIGhost!
 
-[![PyPI](https://img.shields.io/pypi/v/apighost)](https://pypi.org/project/apighost/)
-[![Python](https://img.shields.io/pypi/pyversions/apighost)](https://pypi.org/project/apighost/)
-[![License](https://img.shields.io/pypi/l/apighost)](https://github.com/Coding-Dev-Tools/apighost/blob/main/LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/Coding-Dev-Tools/apighost)
+[![License](https://img.shields.io/github/license/Coding-Dev-Tools/apighost)](https://github.com/Coding-Dev-Tools/apighost/blob/main/LICENSE)
 [![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/apighost)
-[![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/apighost)
-[
 
 ## Why APIGhost?
 
@@ -22,7 +19,7 @@ Every frontend and integration test needs a mock API. Most teams either hardcode
 
 **pip (Python):**
 ```bash
-pip install apighost
+pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 ```
 
 **Homebrew (macOS/Linux):**
