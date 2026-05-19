@@ -145,3 +145,30 @@ def test_head_request(petstore_spec):
     resp = client.head("/pets")
     # HEAD may work due to Flask auto-handling, but shouldn't fail
     assert resp.status_code in (200, 405, 404)
+
+
+def test_latency_zero_no_delay(petstore_spec):
+    """Test that zero latency (default) adds no delay."""
+    import time
+    app = create_app(petstore_spec, latency_range=(0, 0))
+    client = app.test_client()
+    start = time.monotonic()
+    resp = client.get("/pets")
+    elapsed = time.monotonic() - start
+    assert resp.status_code == 200
+    # Zero latency should respond in under 0.5s
+    assert elapsed < 0.5
+
+
+def test_latency_applies_delay(petstore_spec):
+    """Test that latency_range adds a measurable delay to responses."""
+    import time
+    # 50ms-100ms latency — small enough to be fast, large enough to measure
+    app = create_app(petstore_spec, latency_range=(0.05, 0.1))
+    client = app.test_client()
+    start = time.monotonic()
+    resp = client.get("/pets")
+    elapsed = time.monotonic() - start
+    assert resp.status_code == 200
+    # Should take at least 50ms with latency applied
+    assert elapsed >= 0.04  # small tolerance for timing variance

@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import json
 import logging
+import random
 import re
+import time
 from flask import Flask, Response, jsonify, request
 from typing import Any
 
@@ -106,6 +108,11 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
 
         def make_handler(endpoint: Endpoint, scenario: Scenario | None) -> callable:
             def handler(**path_params):
+                # Apply simulated latency if configured
+                if latency_range[1] > 0:
+                    delay = random.uniform(latency_range[0], latency_range[1])
+                    time.sleep(delay)
+
                 # Capture request info for recording
                 req_method = request.method
                 req_path = request.path
