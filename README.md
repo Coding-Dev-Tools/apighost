@@ -12,9 +12,7 @@
 [![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/apighost)
 [![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/apighost)
-[![Awesome Python](https://img.shields.io/badge/Awesome_Python-%E2%87%92-blue?logo=python)](https://github.com/uhub/awesome-python)
-
-Turn any OpenAPI 3.0/3.1 spec into a running mock API server
+[
 
 ## Why APIGhost?
 
@@ -149,7 +147,7 @@ apighost replay my-recording -p 8080            # Replay forever, same responses
 |------|-------|----------|
 | **Free** | $0 | Unlimited local use, 100 requests/session |
 | **Pro** | $12/mo ($119/yr) | Unlimited requests, VCR cassettes, CI/CD integration |
-| **Suite** | $49/mo ($499/yr) | All 11 Revenue Holdings tools under one license |
+| **Suite** | $49/mo ($39 billed annually) | All 11 Revenue Holdings tools under one license |
 
 ## Storage
 

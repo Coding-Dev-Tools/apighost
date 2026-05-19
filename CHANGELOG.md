@@ -1,5 +1,32 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- npm wrapper (`package.json` with 15 npm keywords) for npm discoverability
+- GitHub Actions: npm publish workflow
+- `project.urls` metadata in `pyproject.toml`
+- Python 3.13 to CI test matrix
+- Ruff lint CI step
+
+### Changed
+
+- Documentation branding updated from DevForge to Revenue Holdings
+- CI security hardened: `persist-credentials: false`, pinned permissions
+- CI badge updated from test.yml to ci.yml
+- Removed nonexistent DevForge tool reference from README
+
+### Fixed
+
+- Mojibake in user-facing strings (UTF-8 encoding fixes)
+- Broken CI badge in README (#8)
+- Add PyPI readme content-type for proper rendering
+
+### Security
+
+- CI npm-publish workflow removed (NPM_TOKEN not yet configured)
+
 ## v0.2.0 (2026-05-18)
 
 ### Added
