@@ -34,11 +34,27 @@ def list_scenarios() -> list[dict]:
 
 
 def save_scenario(name: str, description: str = "",
-                  overrides: dict[str, dict] | None = None) -> str:
-    """Save a scenario definition."""
-    _ensure_dir()
+                  overrides: dict[str, dict] | None = None,
+                  output_path: str | None = None) -> str:
+    """Save a scenario definition.
+
+    Args:
+        name: Scenario name (used for filename when output_path is None).
+        description: Optional description.
+        overrides: Route override mappings.
+        output_path: Optional explicit file path to write to.
+                     If None, saves to ~/.apighost/scenarios/<name>.json.
+
+    Returns:
+        The path the scenario was saved to.
+    """
     safe_name = name.replace(" ", "_").replace("/", "-")
-    path = SCENARIO_DIR / f"{safe_name}.json"
+    if output_path:
+        path = Path(output_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        _ensure_dir()
+        path = SCENARIO_DIR / f"{safe_name}.json"
 
     data = {
         "name": safe_name,
