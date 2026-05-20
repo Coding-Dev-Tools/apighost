@@ -7,6 +7,7 @@ import logging
 import random
 import re
 import time
+from collections.abc import Callable
 from flask import Flask, Response, jsonify, request
 from typing import Any
 
@@ -71,8 +72,7 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
     app = Flask(__name__)
 
     # Suppress Flask's default logging
-    import logging as l
-    l.getLogger("werkzeug").setLevel(l.WARNING)
+    logging.getLogger("werkzeug").setLevel(logging.WARNING)
 
     # Track all registered routes for the home page
     routes: list[dict] = []
@@ -106,7 +106,7 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
         }
         routes.append(route_info)
 
-        def make_handler(endpoint: Endpoint, scenario: Scenario | None) -> callable:
+        def make_handler(endpoint: Endpoint, scenario: Scenario | None) -> Callable:
             def handler(**path_params):
                 # Apply simulated latency if configured
                 if latency_range[1] > 0:
