@@ -4,9 +4,13 @@ from __future__ import annotations
 
 import click
 import json
+import re
 import sys
+import threading
 import time
 from pathlib import Path
+
+import requests as http_requests
 
 from . import __version__
 from .faker_utils import generate_value
@@ -121,9 +125,6 @@ def record(spec, output, port, requests):
     This fires sample requests against the mock server to capture
     realistic interactions for later replay.
     """
-    import requests as http_requests
-    import threading
-
     api_spec = parse_spec(spec)
     recorder = Recorder()
     app = create_app(api_spec, recorder=recorder)
