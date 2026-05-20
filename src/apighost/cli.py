@@ -146,9 +146,7 @@ def record(spec, output, port, requests):
     for ep in api_spec.endpoints:
         if count >= requests:
             break
-        url = f"http://127.0.0.1:{port}{ep.path}"
         # Fill path params with fake values
-        import re
         filled_path = ep.path
         for match in re.finditer(r"\{(\w+)\}", ep.path):
             param_name = match.group(1)
