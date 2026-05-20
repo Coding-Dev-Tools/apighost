@@ -300,8 +300,8 @@ class TestCassetteReal:
 
     def test_cli_cassette_info_with_real_cassette(self, runner):
         """Create a cassette file manually, then test 'cassette info' reads it."""
-        from apighost.vcr import save_cassette
         from apighost.schema import CassetteInteraction
+        from apighost.vcr import save_cassette
 
         interaction = CassetteInteraction(
             request_method="GET",
