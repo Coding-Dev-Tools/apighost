@@ -15,15 +15,6 @@ from .scenario import delete_scenario, list_scenarios, load_scenario, save_scena
 from .server import create_app
 from .vcr import Recorder, list_cassettes, load_cassette
 
-try:
-    from revenueholdings_license import require_license
-except ImportError:
-    def require_license(tool):
-        def decorator(func):
-            return func
-        return decorator
-
-
 # Global recorder reference for signal handler
 _current_recorder: Recorder | None = None
 _current_server_thread = None
@@ -37,7 +28,6 @@ def cli():
     Turn any OpenAPI 3.0/3.1 spec into a running mock server
     with realistic fake data and VCR-style recording/replay.
     """
-    require_license("apighost")
 
 
 @cli.command()
