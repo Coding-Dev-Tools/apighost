@@ -1,6 +1,6 @@
 {
   "name": "apighost-cli",
-  "version": "1.0.1",
+  "version": "0.2.0",
   "description": "CLI tool that reads an OpenAPI spec and spawns a realistic mock API server with VCR cassette recording and replay",
   "author": "Revenue Holdings <engineering@revenueholdings.dev>",
   "license": "MIT",
@@ -11,9 +11,6 @@
   "homepage": "https://github.com/Coding-Dev-Tools/apighost#readme",
   "bugs": {
     "url": "https://github.com/Coding-Dev-Tools/apighost/issues"
-  },
-  "bin": {
-    "apighost": "cli.js"
   },
   "keywords": [
     "mock-api",
@@ -32,11 +29,7 @@
     "cli",
     "developer-tools"
   ],
-  "files": [
-    "cli.js"
-  ],
   "engines": {
     "node": ">=16.0.0"
-  },
-  "preferGlobal": true
+  }
 }
