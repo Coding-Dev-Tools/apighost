@@ -218,3 +218,104 @@ class TestServe:
         result = runner.invoke(cli, ["serve", str(invalid_file)])
         assert result.exit_code != 0
         assert "Error" in result.output or "error" in result.output.lower()
+
+
+class TestMainModule:
+    """Tests for `python -m apighost` entry point."""
+
+    def test_main_module_version(self):
+        """Test `python -m apighost --version` outputs version."""
+        import subprocess
+        import sys
+        result = subprocess.run(
+            [sys.executable, "-m", "apighost", "--version"],
+            capture_output=True, text=True, timeout=10,
+        )
+        assert result.returncode == 0
+        assert "apighost" in result.stdout
+
+    def test_main_module_help(self):
+        """Test `python -m apighost --help` lists commands."""
+        import subprocess
+        import sys
+        result = subprocess.run(
+            [sys.executable, "-m", "apighost", "--help"],
+            capture_output=True, text=True, timeout=10,
+        )
+        assert result.returncode == 0
+        assert "serve" in result.stdout
+        assert "record" in result.stdout
+
+
+class TestGenerateOutput:
+    """Tests for 'apighost generate --output' flag."""
+
+    def test_cli_generate_with_output(self, runner, tmp_path):
+        """Test 'apighost generate' with custom output path."""
+        output_file = tmp_path / "custom-gen.json"
+        result = runner.invoke(cli, [
+            "generate", PETSTORE_YAML,
+            "-o", str(output_file),
+            "-n", "output-test",
+        ])
+        assert result.exit_code == 0
+        assert output_file.exists(), "Output file should be written to custom path"
+        import json
+        data = json.loads(output_file.read_text())
+        assert data["name"] == "output-test"
+        assert "overrides" in data
+
+    def test_cli_generate_output_directory_created(self, runner, tmp_path):
+        """Test 'apighost generate --output' creates parent dirs."""
+        nested_dir = tmp_path / "sub" / "dir"
+        nested_file = nested_dir / "gen.json"
+        result = runner.invoke(cli, [
+            "generate", PETSTORE_YAML,
+            "-o", str(nested_file),
+            "-n", "nested-gen",
+        ])
+        assert result.exit_code == 0
+        assert nested_file.exists(), "Parent dirs should be auto-created"
+
+
+class TestScenarioEditRawBody:
+    """Tests for 'apighost scenario edit' with non-JSON body."""
+
+    SCENARIO_NAME = "scenario-raw-body-test"
+
+    def test_cli_scenario_edit_raw_string_body(self, runner):
+        """Test editing scenario with a raw string body (not JSON)."""
+        runner.invoke(cli, ["scenario", "create", self.SCENARIO_NAME, "-d", "Raw body test"])
+        result = runner.invoke(cli, [
+            "scenario", "edit", self.SCENARIO_NAME,
+            "GET /raw", "--status", "200", "--body", "plain text body",
+        ])
+        assert result.exit_code == 0
+        assert self.SCENARIO_NAME in result.output
+        runner.invoke(cli, ["scenario", "delete", self.SCENARIO_NAME])
+
+
+class TestCassetteReal:
+    """Tests for 'apighost cassette' commands with a real cassette."""
+
+    def test_cli_cassette_info_with_real_cassette(self, runner):
+        """Create a cassette file manually, then test 'cassette info' reads it."""
+        from apighost.vcr import save_cassette
+        from apighost.schema import CassetteInteraction
+
+        interaction = CassetteInteraction(
+            request_method="GET",
+            request_path="/test",
+            request_headers={"Accept": "application/json"},
+            request_body=None,
+            response_status=200,
+            response_headers={"Content-Type": "application/json"},
+            response_body='{"ok": true}',
+        )
+        save_cassette("cli-test-cassette", [interaction], "test.yaml")
+
+        result = runner.invoke(cli, ["cassette", "info", "cli-test-cassette"])
+        assert result.exit_code == 0
+        assert "cli-test-cassette" in result.output
+        assert "1" in result.output  # one interaction
+        assert "GET" in result.output

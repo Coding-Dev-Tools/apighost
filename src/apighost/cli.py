@@ -355,7 +355,7 @@ def generate(spec, output, name):
         overrides[key] = {"status": 200, "body": body}
         click.echo(f"   {ep.method:<6} {ep.path}")
 
-    path = save_scenario(scenario_name, f"Auto-generated from {spec}", overrides)
+    path = save_scenario(scenario_name, f"Auto-generated from {spec}", overrides, output_path=output)
     click.echo(f"\n Generated {len(overrides)} endpoint responses → {path}")
 
 
