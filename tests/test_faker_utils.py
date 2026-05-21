@@ -117,3 +117,109 @@ def test_generate_with_bounds():
     """Test integer with min/max."""
     val = generate_value({"type": "integer", "minimum": 10, "maximum": 20})
     assert 10 <= val <= 20
+
+
+def test_generate_string_with_minmax_length():
+    """Test string generation with minLength/maxLength constraints."""
+    val = generate_value({"type": "string", "minLength": 8, "maxLength": 12})
+    assert isinstance(val, str)
+    assert 8 <= len(val) <= 12
+
+
+def test_generate_string_with_pattern():
+    """Test string generation with pattern constraint (falls back to pystr)."""
+    val = generate_value({"type": "string", "pattern": "^[a-z]+$"})
+    assert isinstance(val, str)
+    assert len(val) > 0
+
+
+def test_generate_number():
+    """Test number type generation."""
+    val = generate_value({"type": "number"})
+    assert isinstance(val, float)
+
+
+def test_generate_array_with_bounds():
+    """Test array with minItems/maxItems constraints."""
+    val = generate_value({
+        "type": "array",
+        "items": {"type": "string"},
+        "minItems": 2,
+        "maxItems": 4
+    })
+    assert isinstance(val, list)
+    assert 2 <= len(val) <= 4
+    assert all(isinstance(v, str) for v in val)
+
+
+def test_generate_object_required_not_in_properties():
+    """Test object where required field is not listed in properties."""
+    val = generate_value({
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+        },
+        "required": ["name", "extra_field"]
+    })
+    assert isinstance(val, dict)
+    assert "name" in val
+    assert "extra_field" in val
+
+
+def test_generate_value_empty_schema():
+    """Test generate_value with None schema."""
+    val = generate_value(None)
+    assert isinstance(val, str)
+    assert len(val) > 0
+
+
+def test_generate_value_empty_schema_with_property_hint():
+    """Test generate_value with None schema but matching property hint."""
+    val = generate_value(None, property_name="email")
+    assert isinstance(val, str)
+    assert "@" in val
+
+
+def test_generate_value_none_schema_no_hint():
+    """Test generate_value with None schema and unknown property name."""
+    val = generate_value(None, property_name="nonexistent_prop_xyz")
+    assert isinstance(val, str)
+    assert len(val) > 0
+
+
+def test_generate_with_null_type():
+    """Test generation with unknown type falls back to faker word."""
+    val = generate_value({"type": "null"})
+    assert isinstance(val, str)
+
+
+class TestGenerateStatusCode:
+    """Extended coverage for generate_status_code."""
+
+    def test_server_error_scenario(self):
+        """Test server_error scenario selects 5xx codes."""
+        responses = {200: None, 500: None, 502: None}
+        code = generate_status_code(responses, "server_error")
+        assert code in (500, 502)
+
+    def test_server_error_scenario_fallback(self):
+        """Test server_error scenario fallback when no 5xx present."""
+        code = generate_status_code({200: None, 400: None}, "server_error")
+        assert code == 500
+
+    def test_error_scenario_fallback(self):
+        """Test error scenario fallback when no 4xx present."""
+        code = generate_status_code({200: None, 500: None}, "error")
+        assert code == 400
+
+    def test_happy_path_prefers_201(self):
+        """Test happy path prefers 201 over 204."""
+        responses = {201: None, 204: None, 302: None}
+        code = generate_status_code(responses, "happy")
+        assert code == 201
+
+    def test_happy_path_no_2xx(self):
+        """Test happy path falls back to first response key."""
+        responses = {302: None, 404: None}
+        code = generate_status_code(responses, "happy")
+        assert code == 302

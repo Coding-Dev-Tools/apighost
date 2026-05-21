@@ -3,6 +3,7 @@
 import pytest
 from apighost.cli import cli
 from click.testing import CliRunner
+from pathlib import Path
 
 from . import PETSTORE_YAML
 
@@ -247,6 +248,43 @@ class TestMainModule:
         assert "record" in result.stdout
 
 
+class TestGenerateMaxEndpoints:
+    """Tests for 'apighost generate --max-endpoints' flag."""
+
+    def test_cli_generate_default_all_endpoints(self, runner):
+        """Default generates all endpoints (petstore has 5)."""
+        result = runner.invoke(cli, ["generate", PETSTORE_YAML])
+        assert result.exit_code == 0
+        # Petstore fixture has 5 endpoints, all should be listed
+        lines = [l.strip() for l in result.output.split("\n") if l.strip()]
+        endpoint_lines = [l for l in lines if l.startswith("GET") or l.startswith("POST") or l.startswith("DELETE")]
+        assert len(endpoint_lines) == 5
+        assert "5 endpoint responses" in result.output
+
+    def test_cli_generate_with_max_endpoints(self, runner):
+        """--max-endpoints limits the number of endpoints processed."""
+        result = runner.invoke(cli, ["generate", PETSTORE_YAML, "--max-endpoints", "2"])
+        assert result.exit_code == 0
+        lines = [l.strip() for l in result.output.split("\n") if l.strip()]
+        endpoint_lines = [l for l in lines if l.startswith("GET") or l.startswith("POST") or l.startswith("DELETE")]
+        assert len(endpoint_lines) == 2
+        assert "2 endpoint responses" in result.output
+        assert "limiting to 2/5" in result.output
+
+    def test_cli_generate_max_endpoints_zero(self, runner):
+        """--max-endpoints 0 processes all endpoints."""
+        result = runner.invoke(cli, ["generate", PETSTORE_YAML, "-m", "0"])
+        assert result.exit_code == 0
+        assert "5 endpoint responses" in result.output
+
+    def test_cli_generate_max_endpoints_exceeds_total(self, runner):
+        """--max-endpoints larger than total processes all."""
+        result = runner.invoke(cli, ["generate", PETSTORE_YAML, "-m", "99"])
+        assert result.exit_code == 0
+        assert "5 endpoint responses" in result.output
+        assert "limiting" not in result.output
+
+
 class TestGenerateOutput:
     """Tests for 'apighost generate --output' flag."""
 
@@ -293,6 +331,85 @@ class TestScenarioEditRawBody:
         assert result.exit_code == 0
         assert self.SCENARIO_NAME in result.output
         runner.invoke(cli, ["scenario", "delete", self.SCENARIO_NAME])
+
+
+class TestMainModuleCoverage:
+    """Tests for __main__.py coverage via runpy (not subprocess)."""
+
+    def test_main_module_runpy_version(self):
+        """Test __main__.py via runpy triggers CLI --version."""
+        import runpy
+        import sys
+        saved_argv = sys.argv
+        try:
+            sys.argv = ["apighost", "--version"]
+            with pytest.raises(SystemExit) as exc_info:
+                runpy.run_module("apighost", run_name="__main__")
+            assert exc_info.value.code == 0
+        finally:
+            sys.argv = saved_argv
+
+
+class TestInfoWithData:
+    """Tests for 'apighost info' with cassettes and scenarios present."""
+
+    def test_cli_info_with_cassette_and_scenario(self, runner):
+        """Test info command shows counts when data exists."""
+        from apighost.scenario import save_scenario as scenario_save
+        from apighost.schema import CassetteInteraction
+        from apighost.vcr import save_cassette
+
+        # Create a cassette
+        interaction = CassetteInteraction(
+            request_method="GET",
+            request_path="/info-test",
+            request_headers={},
+            request_body=None,
+            response_status=200,
+            response_headers={},
+            response_body="ok",
+        )
+        save_cassette("info-test-cassette", [interaction], "test.yaml")
+
+        # Create a scenario
+        scenario_save("info-test-scenario", "For info test", {"GET /test": {"status": 200, "body": {}}})
+
+        result = runner.invoke(cli, ["info"])
+        assert result.exit_code == 0
+        assert "APIGhost" in result.output
+
+        # Cleanup
+        cassette_path = Path.home() / ".apighost" / "cassettes" / "info-test-cassette.json"
+        scenario_path = Path.home() / ".apighost" / "scenarios" / "info-test-scenario.json"
+        cassette_path.unlink(missing_ok=True)
+        scenario_path.unlink(missing_ok=True)
+
+
+class TestGenerateNoResponses:
+    """Tests for 'apighost generate' with a spec that has endpoints with no responses."""
+
+    def test_cli_generate_no_responses_spec(self, runner, tmp_path):
+        """Test generate with an endpoint that has no responses defined."""
+        import yaml
+
+        spec = {
+            "openapi": "3.0.0",
+            "info": {"title": "NoResp API", "version": "1.0.0"},
+            "paths": {
+                "/no-resp": {
+                    "get": {
+                        "summary": "No response defined",
+                        "responses": {},
+                    }
+                }
+            },
+        }
+        spec_file = tmp_path / "no-resp.yaml"
+        spec_file.write_text(yaml.dump(spec))
+
+        result = runner.invoke(cli, ["generate", str(spec_file)])
+        assert result.exit_code == 0
+        assert "NoResp API" in result.output
 
 
 class TestCassetteReal:
