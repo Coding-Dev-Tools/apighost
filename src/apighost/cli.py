@@ -338,7 +338,15 @@ def scenario_delete(name):
 @click.option("--name", "-n", default=None, help="Scenario name")
 @click.option("--max-endpoints", "-m", type=int, default=0, help="Maximum number of endpoints to process (0 = all)")
 def generate(spec, output, name, max_endpoints):
-    """Generate sample data and create a scenario from an OpenAPI spec."""
+    """Generate sample data and create a scenario from an OpenAPI spec.
+
+    \b
+    Examples:
+        apighost generate petstore.yaml
+        apighost generate spec.yaml -n my-scenario
+        apighost generate api.json -o custom-scenario.json
+        apighost generate spec.yaml -m 3
+    """
     api_spec = parse_spec(spec)
     scenario_name = name or f"generated-{api_spec.title.replace(' ', '-').lower()}"
 
