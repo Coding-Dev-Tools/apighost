@@ -2,6 +2,8 @@
 
 import json
 import tempfile
+from pathlib import Path
+
 from apighost.parser import (
     _extract_example,
     _infer_type,
@@ -13,7 +15,6 @@ from apighost.parser import (
     load_spec,
     parse_spec,
 )
-from pathlib import Path
 
 # --- _resolve_ref edge cases ---
 
@@ -353,3 +354,5 @@ def test_parse_spec_shared_parameters():
         assert any(p.name == "itemId" for p in del_ep.parameters)
     finally:
         Path(tmp).unlink()
+
+

@@ -12,9 +12,6 @@
   "bugs": {
     "url": "https://github.com/Coding-Dev-Tools/apighost/issues"
   },
-  "bin": {
-    "apighost": "cli.js"
-  },
   "keywords": [
     "mock-api",
     "openapi",
@@ -32,11 +29,7 @@
     "cli",
     "developer-tools"
   ],
-  "files": [
-    "cli.js"
-  ],
   "engines": {
     "node": ">=16.0.0"
-  },
-  "preferGlobal": true
+  }
 }
