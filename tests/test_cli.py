@@ -248,6 +248,43 @@ class TestMainModule:
         assert "record" in result.stdout
 
 
+class TestGenerateMaxEndpoints:
+    """Tests for 'apighost generate --max-endpoints' flag."""
+
+    def test_cli_generate_default_all_endpoints(self, runner):
+        """Default generates all endpoints (petstore has 5)."""
+        result = runner.invoke(cli, ["generate", PETSTORE_YAML])
+        assert result.exit_code == 0
+        # Petstore fixture has 5 endpoints, all should be listed
+        lines = [l.strip() for l in result.output.split("\n") if l.strip()]
+        endpoint_lines = [l for l in lines if l.startswith("GET") or l.startswith("POST") or l.startswith("DELETE")]
+        assert len(endpoint_lines) == 5
+        assert "5 endpoint responses" in result.output
+
+    def test_cli_generate_with_max_endpoints(self, runner):
+        """--max-endpoints limits the number of endpoints processed."""
+        result = runner.invoke(cli, ["generate", PETSTORE_YAML, "--max-endpoints", "2"])
+        assert result.exit_code == 0
+        lines = [l.strip() for l in result.output.split("\n") if l.strip()]
+        endpoint_lines = [l for l in lines if l.startswith("GET") or l.startswith("POST") or l.startswith("DELETE")]
+        assert len(endpoint_lines) == 2
+        assert "2 endpoint responses" in result.output
+        assert "limiting to 2/5" in result.output
+
+    def test_cli_generate_max_endpoints_zero(self, runner):
+        """--max-endpoints 0 processes all endpoints."""
+        result = runner.invoke(cli, ["generate", PETSTORE_YAML, "-m", "0"])
+        assert result.exit_code == 0
+        assert "5 endpoint responses" in result.output
+
+    def test_cli_generate_max_endpoints_exceeds_total(self, runner):
+        """--max-endpoints larger than total processes all."""
+        result = runner.invoke(cli, ["generate", PETSTORE_YAML, "-m", "99"])
+        assert result.exit_code == 0
+        assert "5 endpoint responses" in result.output
+        assert "limiting" not in result.output
+
+
 class TestGenerateOutput:
     """Tests for 'apighost generate --output' flag."""
 

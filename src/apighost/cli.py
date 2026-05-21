@@ -336,16 +336,24 @@ def scenario_delete(name):
 @click.argument("spec", type=click.Path(exists=True))
 @click.option("--output", "-o", default=None, help="Output path for the generated scenario")
 @click.option("--name", "-n", default=None, help="Scenario name")
-def generate(spec, output, name):
+@click.option("--max-endpoints", "-m", type=int, default=0, help="Maximum number of endpoints to process (0 = all)")
+def generate(spec, output, name, max_endpoints):
     """Generate sample data and create a scenario from an OpenAPI spec."""
     api_spec = parse_spec(spec)
     scenario_name = name or f"generated-{api_spec.title.replace(' ', '-').lower()}"
+
+    endpoints = api_spec.endpoints
+    total = len(endpoints)
+    if max_endpoints and max_endpoints > 0:
+        endpoints = endpoints[:max_endpoints]
+        if max_endpoints < total:
+            click.echo(f" (limiting to {max_endpoints}/{total} endpoints)")
 
     overrides = {}
     click.echo(f" Generating scenarios from {api_spec.title} v{api_spec.version}")
     click.echo()
 
-    for ep in api_spec.endpoints[:10]:
+    for ep in endpoints:
         key = f"{ep.method} {ep.path}"
         body = generate_value(
             next(iter(ep.responses.values())).schema_ref if ep.responses else None
