@@ -1,6 +1,6 @@
 {
   "name": "apighost-cli",
-  "version": "0.2.0",
+  "version": "1.0.1",
   "description": "CLI tool that reads an OpenAPI spec and spawns a realistic mock API server with VCR cassette recording and replay",
   "author": "Revenue Holdings <engineering@revenueholdings.dev>",
   "license": "MIT",
