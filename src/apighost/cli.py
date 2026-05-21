@@ -5,12 +5,11 @@ from __future__ import annotations
 import click
 import json
 import re
+import requests as http_requests
 import sys
 import threading
 import time
 from pathlib import Path
-
-import requests as http_requests
 
 from . import __version__
 from .faker_utils import generate_value

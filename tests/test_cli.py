@@ -3,6 +3,7 @@
 import pytest
 from apighost.cli import cli
 from click.testing import CliRunner
+from pathlib import Path
 
 from . import PETSTORE_YAML
 
@@ -293,6 +294,85 @@ class TestScenarioEditRawBody:
         assert result.exit_code == 0
         assert self.SCENARIO_NAME in result.output
         runner.invoke(cli, ["scenario", "delete", self.SCENARIO_NAME])
+
+
+class TestMainModuleCoverage:
+    """Tests for __main__.py coverage via runpy (not subprocess)."""
+
+    def test_main_module_runpy_version(self):
+        """Test __main__.py via runpy triggers CLI --version."""
+        import runpy
+        import sys
+        saved_argv = sys.argv
+        try:
+            sys.argv = ["apighost", "--version"]
+            with pytest.raises(SystemExit) as exc_info:
+                runpy.run_module("apighost", run_name="__main__")
+            assert exc_info.value.code == 0
+        finally:
+            sys.argv = saved_argv
+
+
+class TestInfoWithData:
+    """Tests for 'apighost info' with cassettes and scenarios present."""
+
+    def test_cli_info_with_cassette_and_scenario(self, runner):
+        """Test info command shows counts when data exists."""
+        from apighost.scenario import save_scenario as scenario_save
+        from apighost.schema import CassetteInteraction
+        from apighost.vcr import save_cassette
+
+        # Create a cassette
+        interaction = CassetteInteraction(
+            request_method="GET",
+            request_path="/info-test",
+            request_headers={},
+            request_body=None,
+            response_status=200,
+            response_headers={},
+            response_body="ok",
+        )
+        save_cassette("info-test-cassette", [interaction], "test.yaml")
+
+        # Create a scenario
+        scenario_save("info-test-scenario", "For info test", {"GET /test": {"status": 200, "body": {}}})
+
+        result = runner.invoke(cli, ["info"])
+        assert result.exit_code == 0
+        assert "APIGhost" in result.output
+
+        # Cleanup
+        cassette_path = Path.home() / ".apighost" / "cassettes" / "info-test-cassette.json"
+        scenario_path = Path.home() / ".apighost" / "scenarios" / "info-test-scenario.json"
+        cassette_path.unlink(missing_ok=True)
+        scenario_path.unlink(missing_ok=True)
+
+
+class TestGenerateNoResponses:
+    """Tests for 'apighost generate' with a spec that has endpoints with no responses."""
+
+    def test_cli_generate_no_responses_spec(self, runner, tmp_path):
+        """Test generate with an endpoint that has no responses defined."""
+        import yaml
+
+        spec = {
+            "openapi": "3.0.0",
+            "info": {"title": "NoResp API", "version": "1.0.0"},
+            "paths": {
+                "/no-resp": {
+                    "get": {
+                        "summary": "No response defined",
+                        "responses": {},
+                    }
+                }
+            },
+        }
+        spec_file = tmp_path / "no-resp.yaml"
+        spec_file.write_text(yaml.dump(spec))
+
+        result = runner.invoke(cli, ["generate", str(spec_file)])
+        assert result.exit_code == 0
+        assert "NoResp API" in result.output
 
 
 class TestCassetteReal:
