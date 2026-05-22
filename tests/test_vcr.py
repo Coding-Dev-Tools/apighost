@@ -76,3 +76,35 @@ def test_cassette_interaction_dataclass():
     )
     assert ci.request_method == "POST"
     assert ci.response_status == 201
+
+
+def test_save_and_load_cassette_with_name():
+    """Test saving and loading a named cassette via list_cassettes."""
+    from apighost.vcr import Recorder, list_cassettes, load_cassette, save_cassette
+    r = Recorder()
+    r.record("GET", "/named", {}, None, 200, {}, '"named"')
+    path = save_cassette("named-cassette", r.interactions, "/path/to/spec.yaml")
+    assert path is not None
+
+    cassettes = list_cassettes()
+    names = [c["name"] for c in cassettes]
+    assert "named-cassette" in names
+
+    loaded = load_cassette("named-cassette")
+    assert loaded.name == "named-cassette"
+
+
+def test_list_cassettes_skips_corrupted_json():
+    """list_cassettes skips files with invalid JSON (covers lines 34-35)."""
+    from apighost.vcr import CASSETTE_DIR, CassetteInteraction, list_cassettes, save_cassette
+    # Save a valid cassette
+    ci = CassetteInteraction("GET", "/valid", {}, None, 200, {}, '"ok"')
+    save_cassette("valid-cassette", [ci], "")
+    # Write corrupted JSON
+    bad_file = CASSETTE_DIR / "corrupted.json"
+    bad_file.write_text("this is not json {{{")
+    cassettes = list_cassettes()
+    names = [c["name"] for c in cassettes]
+    assert "valid-cassette" in names
+    assert "corrupted" not in names
+    bad_file.unlink(missing_ok=True)

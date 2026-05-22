@@ -223,3 +223,15 @@ class TestGenerateStatusCode:
         responses = {302: None, 404: None}
         code = generate_status_code(responses, "happy")
         assert code == 302
+
+
+def test_generate_status_code_happy_with_non_standard_status():
+    """Happy path with non-standard status codes returns first key (covers line 152)."""
+    code = generate_status_code({301: None, 418: None}, "happy")
+    assert code == 301
+
+
+def test_generate_status_code_unknown_scenario():
+    """Unknown scenario name with non-empty responses defaults to 200 (covers line 167)."""
+    code = generate_status_code({200: None, 500: None}, "unknown_scenario_name")
+    assert code == 200

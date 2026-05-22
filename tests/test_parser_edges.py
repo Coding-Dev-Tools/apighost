@@ -355,3 +355,33 @@ def test_parse_spec_shared_parameters():
         Path(tmp).unlink()
 
 
+def test_parse_spec_request_body_with_ref(tmp_path):
+    """Operation with requestBody $ref resolves correctly."""
+    spec_data = {
+        "openapi": "3.0.0",
+        "info": {"title": "Test", "version": "1.0.0"},
+        "paths": {
+            "/items": {
+                "post": {
+                    "operationId": "createItem",
+                    "responses": {"201": {"description": "Created"}},
+                    "requestBody": {"$ref": "#/components/requestBodies/ItemBody"},
+                }
+            }
+        },
+        "components": {
+            "requestBodies": {
+                "ItemBody": {
+                    "content": {"application/json": {"schema": {"type": "object"}}},
+                    "required": True,
+                }
+            }
+        },
+    }
+    path = tmp_path / "test.json"
+    path.write_text(json.dumps(spec_data))
+    result = parse_spec(str(path))
+    assert len(result.endpoints) == 1
+    assert result.endpoints[0].request_body_schema == {"type": "object"}
+
+

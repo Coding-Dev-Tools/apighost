@@ -39,3 +39,17 @@ def test_load_nonexistent_scenario():
     """Test loading nonexistent scenario raises."""
     with pytest.raises(FileNotFoundError):
         load_scenario("nonexistent-scenario-xyz")
+
+
+def test_list_scenarios_skips_corrupted_json():
+    """list_scenarios skips files with invalid JSON (covers lines 31-32)."""
+    from apighost.scenario import SCENARIO_DIR
+    save_scenario("good-scenario", "valid")
+    # Write corrupted JSON
+    bad_file = SCENARIO_DIR / "corrupted.json"
+    bad_file.write_text("this is not json {{{")
+    scenarios = list_scenarios()
+    names = [s["name"] for s in scenarios]
+    assert "good-scenario" in names
+    assert "corrupted" not in names
+    bad_file.unlink(missing_ok=True)
