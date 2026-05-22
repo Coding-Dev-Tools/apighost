@@ -5,16 +5,14 @@ without requiring a live server. The werkzeug run_simple is mocked
 so server startup is skipped after all setup logic executes.
 """
 
-import json
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock
-
-from click.testing import CliRunner
-from apighost.cli import cli, _on_shutdown
+from apighost.cli import _on_shutdown, cli
+from apighost.scenario import save_scenario
 from apighost.schema import CassetteInteraction
 from apighost.vcr import save_cassette
-from apighost.scenario import save_scenario
+from click.testing import CliRunner
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from . import PETSTORE_YAML
 
