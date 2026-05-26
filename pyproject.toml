@@ -50,8 +50,14 @@ Changelog = "https://github.com/Coding-Dev-Tools/apighost/releases"
 [project.scripts]
 apighost = "apighost.cli:cli"
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+apighost = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -66,4 +72,4 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 ignore = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["*"]
+known-first-party = ["apighost"]
