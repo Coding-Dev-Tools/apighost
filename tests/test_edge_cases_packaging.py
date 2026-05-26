@@ -5,10 +5,10 @@ Covers uncovered paths and packaging config parity.
 
 from __future__ import annotations
 
-import tomllib
-
-from click.testing import CliRunner
 from pathlib import Path
+
+import tomllib
+from click.testing import CliRunner
 
 from apighost.cli import cli
 

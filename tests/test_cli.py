@@ -1,9 +1,11 @@
 """Tests for CLI commands."""
 
-import pytest
-from apighost.cli import cli
-from click.testing import CliRunner
 from pathlib import Path
+
+import pytest
+from click.testing import CliRunner
+
+from apighost.cli import cli
 
 from . import PETSTORE_YAML
 
