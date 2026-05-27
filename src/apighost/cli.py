@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 import click
 import json
 import re
@@ -11,6 +9,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from typing import Any
 
 import click
 import requests as http_requests
