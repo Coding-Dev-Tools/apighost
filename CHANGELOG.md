@@ -1,5 +1,6 @@
 # Changelog
 
+
 ## [Unreleased]
 
 ### Added
@@ -27,7 +28,7 @@
 
 - CI npm-publish workflow removed (NPM_TOKEN not yet configured)
 
-## v0.2.0 (2026-05-18)
+## [0.2.0] - 2026-05-18
 
 ### Added
 - `--host` option to `serve` command for binding to custom addresses
@@ -58,7 +59,7 @@
 - Dependabot: bump `actions/checkout` from 4 to 6
 - Dependabot: bump `actions/setup-python` from 5 to 6
 
-## v0.1.0 (2024)
+## [0.1.0] - 2024
 
 - Initial release
 - OpenAPI 3.0/3.1 spec parsing
