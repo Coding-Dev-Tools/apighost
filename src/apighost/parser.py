@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from typing import Any
 import re
 from pathlib import Path
 from typing import Any
