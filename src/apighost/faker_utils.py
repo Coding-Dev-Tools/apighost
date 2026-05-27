@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 import random
-from typing import Any
+from faker import Faker
+from typing import Any, Callable
 
 from faker import Faker
 
 _faker = Faker()
 
 # Map OpenAPI format strings to Faker providers
-FORMAT_TO_FAKER: dict[str, callable] = {
+FORMAT_TO_FAKER: dict[str, Callable[[], Any]] = {
     "email": lambda: _faker.email(),
     "uri": lambda: _faker.url(),
     "url": lambda: _faker.url(),
@@ -32,7 +33,7 @@ FORMAT_TO_FAKER: dict[str, callable] = {
 }
 
 # Property name -> realistic value generators
-PROPERTY_HINTS: dict[str, callable] = {
+PROPERTY_HINTS: dict[str, Callable[[], Any]] = {
     "username": lambda: _faker.user_name(),
     "name": lambda: _faker.name(),
     "first_name": lambda: _faker.first_name(),

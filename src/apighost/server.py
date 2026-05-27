@@ -6,9 +6,8 @@ import json
 import logging
 import random
 import re
-import time
-from collections.abc import Callable
-from typing import Any
+from typing import Any, Callable
+from flask import Flask, Response, jsonify, request
 
 from flask import Flask, Response, jsonify, request
 
@@ -35,7 +34,9 @@ def _make_response(status: int, body: Any, content_type: str = "application/json
     """Build a Flask Response."""
     if isinstance(body, str):
         return Response(body, status=status, content_type=content_type)
-    return jsonify(body), status
+    response = jsonify(body)
+    response.status_code = status
+    return response
 
 
 def _build_response_for_endpoint(endpoint: Endpoint,
