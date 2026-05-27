@@ -56,9 +56,9 @@ include-package-data = true
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-apighost = ["py.typed"]
 
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
