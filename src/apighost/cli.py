@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from typing import Any
+
+import click
 import json
 import re
 import sys
@@ -19,6 +22,15 @@ from .scenario import delete_scenario, list_scenarios, load_scenario, save_scena
 from .server import create_app
 from .vcr import Recorder, list_cassettes, load_cassette
 
+try:
+    from revenueholdings_license import require_license
+except ImportError:
+    def require_license(tool) -> Any:
+        def decorator(func) -> Any:
+            return func
+        return decorator
+
+
 # Global recorder reference for signal handler
 _current_recorder: Recorder | None = None
 _current_server_thread = None
@@ -26,7 +38,7 @@ _current_server_thread = None
 
 @click.group()
 @click.version_option(__version__, prog_name="apighost")
-def cli():
+def cli() -> None:
     """APIGhost - OpenAPI spec to mock server with VCR recording.
 
     Turn any OpenAPI 3.0/3.1 spec into a running mock server
@@ -43,7 +55,7 @@ def cli():
 @click.option("--cassette-name", default=None, help="Name for the recorded cassette")
 @click.option("--latency", type=float, default=0.0, help="Simulated latency in seconds")
 @click.option("--watch", is_flag=True, help="Watch spec file for changes (auto-reload)")
-def serve(spec, port, host, scenario, record, cassette_name, latency, watch):
+def serve(spec, port, host, scenario, record, cassette_name, latency, watch) -> None:
     """Start a mock server from an OpenAPI spec file.
 
     \b
@@ -106,7 +118,7 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch):
         _on_shutdown(recorder, name, spec)
 
 
-def _on_shutdown(recorder, cassette_name, spec_path):
+def _on_shutdown(recorder, cassette_name, spec_path) -> None:
     """Handle server shutdown - save cassette if recording."""
     if recorder and recorder.count > 0:
         path = recorder.save(cassette_name or f"recording-{int(time.time())}", spec_path)
@@ -119,7 +131,7 @@ def _on_shutdown(recorder, cassette_name, spec_path):
 @click.option("--output", "-o", default=None, help="Output file for cassette (default: auto)")
 @click.option("--port", "-p", default=8081, help="Port for the recording server")
 @click.option("--requests", "-n", default=5, help="Number of sample requests to make")
-def record(spec, output, port, requests):
+def record(spec, output, port, requests) -> Any:
     """Start server, make sample requests, and record them to a cassette.
 
     This fires sample requests against the mock server to capture
@@ -173,7 +185,7 @@ def record(spec, output, port, requests):
 @click.argument("cassette", type=click.Path())
 @click.option("--port", "-p", default=8082, help="Port for the replay server")
 @click.option("--host", default="127.0.0.1", help="Host to bind to")
-def replay(cassette, port, host):
+def replay(cassette, port, host) -> Any:
     """Replay a recorded cassette as a mock server.
 
     Exact recorded responses will be served matching request paths.
@@ -196,7 +208,7 @@ def replay(cassette, port, host):
     app = Flask(__name__)
 
     @app.route("/<path:path>", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
-    def _replay_handler(path):
+    def _replay_handler(path) -> Any:
         full_path = "/" + path
         for interaction in cassette_data.interactions:
             req_path = interaction.request_path.rstrip("/")
@@ -211,7 +223,7 @@ def replay(cassette, port, host):
         return jsonify({"error": "No matching recorded interaction", "path": full_path}), 404
 
     @app.route("/")
-    def _replay_home():
+    def _replay_home() -> Any:
         return jsonify({
             "service": f"APIGhost Replay - {cassette_data.name}",
             "interactions": len(cassette_data.interactions),
@@ -230,12 +242,12 @@ def replay(cassette, port, host):
 
 
 @cli.group()
-def cassette():
+def cassette() -> None:
     """Manage recorded cassettes."""
 
 
 @cassette.command("list")
-def cassette_list():
+def cassette_list() -> None:
     """List all recorded cassettes."""
     cassettes = list_cassettes()
     if not cassettes:
@@ -250,7 +262,7 @@ def cassette_list():
 
 @cassette.command("info")
 @click.argument("name")
-def cassette_info(name):
+def cassette_info(name) -> None:
     """Show details of a recorded cassette."""
     try:
         data = load_cassette(name)
@@ -268,12 +280,12 @@ def cassette_info(name):
 
 
 @cli.group()
-def scenario():
+def scenario() -> None:
     """Manage response scenarios."""
 
 
 @scenario.command("list")
-def scenario_list():
+def scenario_list() -> None:
     """List all saved scenarios."""
     scenarios = list_scenarios()
     if not scenarios:
@@ -289,7 +301,7 @@ def scenario_list():
 @scenario.command("create")
 @click.argument("name")
 @click.option("--description", "-d", default="", help="Scenario description")
-def scenario_create(name, description):
+def scenario_create(name, description) -> None:
     """Create a new empty scenario."""
     path = save_scenario(name, description)
     click.echo(f" Created scenario '{name}' → {path}")
@@ -300,7 +312,7 @@ def scenario_create(name, description):
 @click.argument("route")  # e.g. "GET /users/{id}"
 @click.option("--status", type=int, default=200, help="Response status code")
 @click.option("--body", default=None, help="Response body JSON")
-def scenario_edit(name, route, status, body):
+def scenario_edit(name, route, status, body) -> None:
     """Add/edit a route override in a scenario.
 
     ROUTE format: "GET /users/{id}" or "POST /items"
@@ -325,7 +337,7 @@ def scenario_edit(name, route, status, body):
 
 @scenario.command("delete")
 @click.argument("name")
-def scenario_delete(name):
+def scenario_delete(name) -> None:
     """Delete a scenario."""
     if delete_scenario(name):
         click.echo(f" Deleted scenario '{name}'")
@@ -337,17 +349,8 @@ def scenario_delete(name):
 @click.argument("spec", type=click.Path(exists=True))
 @click.option("--output", "-o", default=None, help="Output path for the generated scenario")
 @click.option("--name", "-n", default=None, help="Scenario name")
-@click.option("--max-endpoints", "-m", type=int, default=0, help="Maximum number of endpoints to process (0 = all)")
-def generate(spec, output, name, max_endpoints):
-    """Generate sample data and create a scenario from an OpenAPI spec.
-
-    \b
-    Examples:
-        apighost generate petstore.yaml
-        apighost generate spec.yaml -n my-scenario
-        apighost generate api.json -o custom-scenario.json
-        apighost generate spec.yaml -m 3
-    """
+def generate(spec, output, name) -> None:
+    """Generate sample data and create a scenario from an OpenAPI spec."""
     api_spec = parse_spec(spec)
     scenario_name = name or f"generated-{api_spec.title.replace(' ', '-').lower()}"
 
@@ -375,7 +378,7 @@ def generate(spec, output, name, max_endpoints):
 
 
 @cli.command()
-def info():
+def info() -> None:
     """Show APIGhost configuration and storage info."""
     click.echo(f"APIGhost v{__version__}")
     click.echo(f"Cassettes: {Path.home() / '.apighost' / 'cassettes'}")
