@@ -259,7 +259,12 @@ class TestGenerateMaxEndpoints:
         assert result.exit_code == 0
         # Petstore fixture has 5 endpoints, all should be listed
         lines = [line.strip() for line in result.output.split("\n") if line.strip()]
-        endpoint_lines = [line for line in lines if line.startswith("GET") or line.startswith("POST") or line.startswith("DELETE")]
+        endpoint_lines = [
+            line for line in lines
+            if line.startswith("GET")
+            or line.startswith("POST")
+            or line.startswith("DELETE")
+        ]
         assert len(endpoint_lines) == 5
         assert "5 endpoint responses" in result.output
 
@@ -268,7 +273,12 @@ class TestGenerateMaxEndpoints:
         result = runner.invoke(cli, ["generate", PETSTORE_YAML, "--max-endpoints", "2"])
         assert result.exit_code == 0
         lines = [line.strip() for line in result.output.split("\n") if line.strip()]
-        endpoint_lines = [line for line in lines if line.startswith("GET") or line.startswith("POST") or line.startswith("DELETE")]
+        endpoint_lines = [
+            line for line in lines
+            if line.startswith("GET")
+            or line.startswith("POST")
+            or line.startswith("DELETE")
+        ]
         assert len(endpoint_lines) == 2
         assert "2 endpoint responses" in result.output
         assert "limiting to 2/5" in result.output

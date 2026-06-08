@@ -218,7 +218,12 @@ def test_build_response_with_schema_ref():
     from apighost.server import _build_response_for_endpoint
     ep = Endpoint(
         path="/schema-only", method="get",
-        responses={200: ApiResponse(status_code=200, schema_ref={"type": "object", "properties": {"id": {"type": "integer"}}})}
+        responses={
+            200: ApiResponse(
+                status_code=200,
+                schema_ref={"type": "object", "properties": {"id": {"type": "integer"}}},
+            )
+        }
     )
     body, status = _build_response_for_endpoint(ep, scenario=None, params={})
     assert status == 200
