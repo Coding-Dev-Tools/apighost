@@ -18,22 +18,17 @@ Every frontend and integration test needs a mock API. Most teams either hardcode
 
 ## Installation
 
-**pip (Python):**
+**pip (Python) — recommended:**
+```bash
+pip install apighost
+```
+
+Requires Python 3.10+. To install the latest unreleased code straight from source:
 ```bash
 pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 ```
 
-**Homebrew (macOS/Linux):**
-```bash
-brew tap Coding-Dev-Tools/tap
-brew install apighost
-```
-
-**Scoop (Windows):**
-```bash
-scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
-scoop install apighost
-```
+> **Homebrew & Scoop:** coming soon. Until the tap and bucket are published, use the `pip install apighost` command above (works on macOS, Linux, and Windows).
 
 ## Quick Start
 
@@ -123,21 +118,22 @@ apighost replay my-recording -p 8080            # Replay forever, same responses
 
 ## Alternatives Comparison
 
-| Feature | APIGhost | Prism | WireMock | Mockoon |
-|---------|----------|-------|----------|---------|
-| OpenAPI ? mock server | ? | ? | ? | ? |
-| VCR record/replay | ? | ? | ? | ? |
-| Scenario switching | ? | ? | ? | ? |
-| Realistic fake data | ? | ? | ? | ? |
-| Zero-config from spec | ? | ? | ? | ? |
-| CLI-first (no GUI) | ? | ? | ? | ? |
-| Spec change auto-sync | ? | ? | ? | ? |
+| Capability | APIGhost | Prism | WireMock | Mockoon |
+|------------|:--------:|:-----:|:--------:|:-------:|
+| Mock generated directly from an OpenAPI spec | ✓ | ✓ | ~ | ✓ |
+| Schema-aware fake data | ✓ | ✓ | ~ | ✓ |
+| VCR-style record & replay (deterministic cassettes) | ✓ | ✗ | ✓ | ~ |
+| Named scenario presets for edge cases | ✓ | ~ | ✓ | ✓ |
+| Runs headless from the CLI | ✓ | ✓ | ✓ | ✓ |
+| Runtime &amp; install | Python · pip | Node · npm | JVM · jar/Docker | Node · npm/app |
 
-**APIGhost vs Prism**: Prism generates mock responses but can't record/replay or switch scenarios. APIGhost adds VCR cassettes and scenario presets.
+_Legend: ✓ built-in · ~ available via an add-on, proxy mode, or hosted tier · ✗ not supported. Capabilities change — see each project's docs for the current state._
 
-**APIGhost vs WireMock**: WireMock requires hand-coded stubs. APIGhost generates everything from your OpenAPI spec — zero config.
+**APIGhost vs Prism**: Prism is a mature Node tool that also mocks straight from a spec and generates dynamic, schema-valid data. It has no VCR-style cassette record/replay, and example selection happens via the HTTP `Prefer` header rather than saved, named presets. APIGhost is Python-native and bundles record/replay plus named scenarios in one CLI.
 
-**APIGhost vs Mockoon**: Mockoon needs a GUI. APIGhost is CLI-first — perfect for CI and headless environments.
+**APIGhost vs WireMock**: WireMock is a powerful JVM tool with rich request matching, stateful scenarios, fault injection, and its own record-and-playback. Generating a mock straight from an OpenAPI document is strongest in WireMock Cloud and extensions; the OSS core centers on stub mappings and proxy recording. APIGhost generates the mock directly from your spec with no JVM.
+
+**APIGhost vs Mockoon**: Mockoon offers a friendly visual editor and also ships an official CLI (`@mockoon/cli`) and Docker image, so it runs headless too. APIGhost is CLI-only and spec-first — there's no GUI to hand-design mocks; everything comes from your OpenAPI spec.
 
 ## Pricing
 
@@ -177,5 +173,4 @@ MIT — see [LICENSE](LICENSE)
 
 ---
 
-<sub>Part of the [Coding-Dev-Tools](https://github.com/Coding-Dev-Tools) ecosystem — a suite of developer CLI tools. Also check out [API Contract Guardian](https://github.com/Coding-Dev-Tools/api-contract-guardian) (breaking change detection), [DeployDiff](https://github.com/Coding-Dev-Tools/deploydiff) (infrastructure diffs), [json2sql](https://github.com/Coding-Dev-Tools/json2sql) (JSON → SQL), [ConfigDrift](https://github.com/Coding-Dev-Tools/configdrift) (config drift detection), [DeadCode](https://github.com/Coding-Dev-Tools/deadcode) (dead code cleanup), [Envault](https://github.com/Coding-Dev-Tools/envault) (env sync), [SchemaForge](https://github.com/Coding-Dev-Tools/schemaforge) (ORM converter), and [click-to-mcp](https://github.com/Coding-Dev-Tools/click-to-mcp) (CLI → MCP server).</sub>
-
+<sub>Part of the [Coding-Dev-Tools](https://github.com/Coding-Dev-Tools) ecosystem — a suite of developer CLI tools. Also check out [API Contract Guardian](https://github.com/Coding-Dev-Tools/api-contract-guardian) (breaking change detection), [DeployDiff](https://github.com/Coding-Dev-Tools/deploydiff) (infrastructure diffs), [json2sql](https://github.com/Coding-Dev-Tools/json2sql) (JSON → SQL), [ConfigDrift](https://github.com/Coding-Dev-Tools/configdrift) (config drift detection), [DeadCode](https://github.com/Coding-Dev-Tools/deadcode) (dead code cleanup), [Envault](https://github.com/Coding-Dev-Tools/envault) (env sync), [SchemaForge](https://github.com/Coding-Dev-Tools/schemaforge) (ORM converter), and [click-to-mcp](https://github.com
