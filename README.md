@@ -10,7 +10,6 @@
 [![License](https://img.shields.io/github/license/Coding-Dev-Tools/apighost)](https://github.com/Coding-Dev-Tools/apighost/blob/main/LICENSE)
 [![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/apighost)
-[![PyPI](https://img.shields.io/pypi/v/apighost)](https://pypi.org/project/apighost/)
 
 ## Why APIGhost?
 
@@ -18,17 +17,17 @@ Every frontend and integration test needs a mock API. Most teams either hardcode
 
 ## Installation
 
-**pip (Python) — recommended:**
+**pip (Python) — recommended.** APIGhost is published to the project's own package index (not yet on PyPI.org), so point pip at it:
 ```bash
-pip install apighost
+pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost
 ```
 
-Requires Python 3.10+. To install the latest unreleased code straight from source:
+Prefer not to pass a flag every time? Install straight from the source repo — this always works and tracks the latest code:
 ```bash
 pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 ```
 
-> **Homebrew & Scoop:** coming soon. Until the tap and bucket are published, use the `pip install apighost` command above (works on macOS, Linux, and Windows).
+Requires Python 3.10+ (pure Python, no compiled wheels). Public PyPI publishing is planned once the licensing system is finalized; **Homebrew & Scoop** are coming once the tap and bucket are published.
 
 ## Quick Start
 
