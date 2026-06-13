@@ -165,7 +165,11 @@ def parse_spec(path: str | Path) -> ApiSpec:
             if not operation:
                 continue
 
-            op_params = shared_params + _parse_parameters(operation, path_pattern, raw)
+            op_only = _parse_parameters(operation, path_pattern, raw)
+            # Per OpenAPI 3.x spec: operation params override path-level params with
+            # the same (name, in) key — deduplicate keeping the operation's version.
+            op_keys = {(p.name, p.location) for p in op_only}
+            op_params = [p for p in shared_params if (p.name, p.location) not in op_keys] + op_only
 
             endpoint = Endpoint(
                 path=path_pattern,

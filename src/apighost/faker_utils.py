@@ -122,7 +122,15 @@ def generate_value(schema: dict | None, property_name: str = "") -> Any:
 
     if schema_type == "array":
         items = schema.get("items", {})
-        count = max(1, min(schema.get("minItems", 1), schema.get("maxItems", 5) or 3))
+        # Respect schema bounds: pick a random count in [minItems, maxItems].
+        # maxItems may be None (unbounded) — cap at 5 for practicality.
+        min_items = max(0, schema.get("minItems") or 0)
+        raw_max = schema.get("maxItems")
+        max_items = min(int(raw_max), 5) if raw_max is not None else 5
+        max_items = max(max_items, min_items)  # guard against invalid schemas
+        count = random.randint(min_items, max_items) if min_items != max_items else min_items
+        # Always produce at least 1 item so the caller gets something useful.
+        count = max(count, 1)
         return [generate_value(items) for _ in range(count)]
 
     if schema_type == "object":
