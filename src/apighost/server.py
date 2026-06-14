@@ -6,8 +6,8 @@ import json
 import logging
 import random
 import re
-import time
 from collections.abc import Callable
+from flask import Flask, Response, jsonify, request
 from typing import Any
 
 from flask import Flask, Response, jsonify, request
@@ -35,7 +35,9 @@ def _make_response(status: int, body: Any, content_type: str = "application/json
     """Build a Flask Response."""
     if isinstance(body, str):
         return Response(body, status=status, content_type=content_type)
-    return jsonify(body), status
+    response = jsonify(body)
+    response.status_code = status
+    return response
 
 
 def _build_response_for_endpoint(endpoint: Endpoint,
@@ -79,7 +81,7 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
     routes: list[dict] = []
 
     @app.route("/")
-    def _apighost_home():
+    def _apighost_home() -> Any:
         """Generated API home — list available routes."""
         return jsonify({
             "service": spec.title or "APIGhost Mock Server",
@@ -91,7 +93,7 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
         })
 
     @app.route("/_apighost/health")
-    def _apighost_health():
+    def _apighost_health() -> Any:
         return jsonify({"status": "ok", "endpoints": len(spec.endpoints), "recording": recorder is not None})
 
     # Register each endpoint
@@ -108,12 +110,7 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
         routes.append(route_info)
 
         def make_handler(endpoint: Endpoint, scenario: Scenario | None) -> Callable:
-            def handler(**path_params):
-                # Apply simulated latency if configured
-                if latency_range[1] > 0:
-                    delay = random.uniform(latency_range[0], latency_range[1])
-                    time.sleep(delay)
-
+            def handler(**path_params) -> Any:
                 # Capture request info for recording
                 req_method = request.method
                 req_path = request.path

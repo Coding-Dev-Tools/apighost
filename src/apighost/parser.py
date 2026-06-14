@@ -46,7 +46,7 @@ def _resolve_schema_refs(schema: dict | None, spec: dict) -> dict | None:
     """Recursively resolve all $ref pointers in a schema tree."""
     if not schema:
         return schema
-    resolved = {}
+    resolved: dict[Any, Any] = {}
     for key, value in schema.items():
         if key == "$ref" and isinstance(value, str):
             ref_target = _resolve_ref(value, spec)
