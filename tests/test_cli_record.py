@@ -8,13 +8,15 @@ The replay route handler tests exercise the inline Flask app created
 inside the replay command, covering the match/miss/home routes.
 """
 
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 import pytest
+from click.testing import CliRunner
+
 from apighost.cli import cli
 from apighost.schema import CassetteInteraction
 from apighost.vcr import save_cassette
-from click.testing import CliRunner
-from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 from . import PETSTORE_YAML
 

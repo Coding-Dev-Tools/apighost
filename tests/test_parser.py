@@ -2,8 +2,9 @@
 
 import json
 import tempfile
-from apighost.parser import _infer_type, get_param_pattern, parse_spec
 from pathlib import Path
+
+from apighost.parser import _infer_type, get_param_pattern, parse_spec
 
 from . import PETSTORE_YAML
 

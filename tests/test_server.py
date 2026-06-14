@@ -1,7 +1,9 @@
 """Tests for the mock server."""
 
 import json
+
 import pytest
+
 from apighost.parser import parse_spec
 from apighost.scenario import Scenario
 from apighost.schema import ApiSpec
@@ -180,8 +182,9 @@ def test_extract_path_params_no_match():
 
 def test_make_response_with_dict():
     """_make_response with dict body returns jsonify tuple (covers line 37)."""
-    from apighost.server import _make_response
     from flask import Flask
+
+    from apighost.server import _make_response
     app = Flask(__name__)
     with app.app_context():
         resp = _make_response(201, {"id": 1, "name": "test"})
@@ -215,7 +218,12 @@ def test_build_response_with_schema_ref():
     from apighost.server import _build_response_for_endpoint
     ep = Endpoint(
         path="/schema-only", method="get",
-        responses={200: ApiResponse(status_code=200, schema_ref={"type": "object", "properties": {"id": {"type": "integer"}}})}
+        responses={
+            200: ApiResponse(
+                status_code=200,
+                schema_ref={"type": "object", "properties": {"id": {"type": "integer"}}},
+            )
+        }
     )
     body, status = _build_response_for_endpoint(ep, scenario=None, params={})
     assert status == 200

@@ -8,8 +8,9 @@ import random
 import re
 import time
 from collections.abc import Callable
-from flask import Flask, Response, jsonify, request
 from typing import Any
+
+from flask import Flask, Response, jsonify, request
 
 from .faker_utils import generate_status_code, generate_value
 from .parser import get_param_pattern
