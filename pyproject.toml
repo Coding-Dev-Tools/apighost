@@ -29,7 +29,6 @@ dependencies = [
     "flask>=3.0.0",
     "rich>=13.0.0",
     "requests>=2.33.0",
-    "jsonschema>=4.17.0",
     "werkzeug>=3.0.0",
 ]
 
