@@ -10,7 +10,6 @@
 [![License](https://img.shields.io/github/license/Coding-Dev-Tools/apighost)](https://github.com/Coding-Dev-Tools/apighost/blob/main/LICENSE)
 [![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/apighost)
-[![PyPI](https://img.shields.io/pypi/v/apighost)](https://pypi.org/project/apighost/)
 
 ## Why APIGhost?
 
@@ -23,17 +22,8 @@ Every frontend and integration test needs a mock API. Most teams either hardcode
 pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 ```
 
-**Homebrew (macOS/Linux):**
-```bash
-brew tap Coding-Dev-Tools/tap
-brew install apighost
-```
-
-**Scoop (Windows):**
-```bash
-scoop bucket add Coding-Dev-Tools https://github.com/Coding-Dev-Tools/scoop-bucket
-scoop install apighost
-```
+**Package managers:**
+Homebrew, Scoop, and other distribution channels are planned but not yet published. Stay tuned.
 
 ## Quick Start
 
@@ -125,13 +115,13 @@ apighost replay my-recording -p 8080            # Replay forever, same responses
 
 | Feature | APIGhost | Prism | WireMock | Mockoon |
 |---------|----------|-------|----------|---------|
-| OpenAPI ? mock server | ? | ? | ? | ? |
-| VCR record/replay | ? | ? | ? | ? |
-| Scenario switching | ? | ? | ? | ? |
-| Realistic fake data | ? | ? | ? | ? |
-| Zero-config from spec | ? | ? | ? | ? |
-| CLI-first (no GUI) | ? | ? | ? | ? |
-| Spec change auto-sync | ? | ? | ? | ? |
+| OpenAPI → mock server | ✅ | ✅ | ❌ | ✅ |
+| VCR record/replay | ✅ | ❌ | ✅ | ❌ |
+| Scenario switching | ✅ | ❌ | ✅ | ✅ |
+| Realistic fake data | ✅ | ✅ | ❌ | ❌ |
+| Zero-config from spec | ✅ | ✅ | ❌ | ✅ |
+| CLI-first (no GUI) | ✅ | ✅ | ✅ | ❌ |
+| Spec change auto-sync | ✅ | ✅ | ❌ | ❌ |
 
 **APIGhost vs Prism**: Prism generates mock responses but can't record/replay or switch scenarios. APIGhost adds VCR cassettes and scenario presets.
 
