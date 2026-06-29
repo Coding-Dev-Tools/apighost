@@ -55,7 +55,9 @@ class TestServeSetup:
     @patch("werkzeug.serving.run_simple")
     def test_serve_custom_host_port(self, mock_run, runner):
         """Serve respects --host and --port options."""
-        result = runner.invoke(cli, ["serve", PETSTORE_YAML, "--host", "0.0.0.0", "-p", "9999"])
+        result = runner.invoke(
+            cli, ["serve", PETSTORE_YAML, "--host", "0.0.0.0", "-p", "9999"]
+        )
         assert result.exit_code == 0
         call_args = mock_run.call_args
         assert call_args[0][0] == "0.0.0.0"
@@ -64,8 +66,12 @@ class TestServeSetup:
     @patch("werkzeug.serving.run_simple")
     def test_serve_with_scenario(self, mock_run, runner):
         """Serve loads a scenario and shows override count."""
-        save_scenario("serve-scenario-test", "Test", {"GET /pets": {"status": 200, "body": {}}})
-        result = runner.invoke(cli, ["serve", PETSTORE_YAML, "--scenario", "serve-scenario-test"])
+        save_scenario(
+            "serve-scenario-test", "Test", {"GET /pets": {"status": 200, "body": {}}}
+        )
+        result = runner.invoke(
+            cli, ["serve", PETSTORE_YAML, "--scenario", "serve-scenario-test"]
+        )
         assert result.exit_code == 0
         assert "Scenario: serve-scenario-test" in result.output
         assert "1 overrides" in result.output
@@ -73,7 +79,9 @@ class TestServeSetup:
     @patch("werkzeug.serving.run_simple")
     def test_serve_scenario_not_found(self, mock_run, runner):
         """Serve prints warning when scenario doesn't exist."""
-        result = runner.invoke(cli, ["serve", PETSTORE_YAML, "--scenario", "serve-scenario-missing-test"])
+        result = runner.invoke(
+            cli, ["serve", PETSTORE_YAML, "--scenario", "serve-scenario-missing-test"]
+        )
         assert result.exit_code == 0
         assert "not found" in result.output.lower()
 
@@ -87,7 +95,9 @@ class TestServeSetup:
     @patch("werkzeug.serving.run_simple")
     def test_serve_with_record_custom_cassette_name(self, mock_run, runner):
         """Serve with --record --cassette-name uses custom name."""
-        result = runner.invoke(cli, ["serve", PETSTORE_YAML, "--record", "--cassette-name", "my-rec"])
+        result = runner.invoke(
+            cli, ["serve", PETSTORE_YAML, "--record", "--cassette-name", "my-rec"]
+        )
         assert result.exit_code == 0
         assert "my-rec" in result.output
 
@@ -173,7 +183,9 @@ class TestReplaySetup:
         )
         save_cassette("replay-serve-test", [interaction], None)
 
-        result = runner.invoke(cli, ["replay", "replay-serve-test", "-p", "9090", "--host", "0.0.0.0"])
+        result = runner.invoke(
+            cli, ["replay", "replay-serve-test", "-p", "9090", "--host", "0.0.0.0"]
+        )
         assert result.exit_code == 0
         call_args = mock_run.call_args
         assert call_args[0][0] == "0.0.0.0"
