@@ -76,13 +76,16 @@ def _parse_parameters(path_item: dict, path: str, spec: dict) -> list[Parameter]
         name = resolved.get("name", "")
         if name not in seen:
             seen.add(name)
-            params.append(Parameter(
-                name=name,
-                location=resolved.get("in", "query"),
-                required=resolved.get("required", False),
-                schema_ref=resolved.get("schema", {}),
-                example=resolved.get("example") or resolved.get("schema", {}).get("example"),
-            ))
+            params.append(
+                Parameter(
+                    name=name,
+                    location=resolved.get("in", "query"),
+                    required=resolved.get("required", False),
+                    schema_ref=resolved.get("schema", {}),
+                    example=resolved.get("example")
+                    or resolved.get("schema", {}).get("example"),
+                )
+            )
 
     return params
 
