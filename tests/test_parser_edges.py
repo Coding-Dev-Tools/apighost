@@ -83,13 +83,7 @@ def test_resolve_schema_refs_nested_ref():
 
 def test_resolve_schema_refs_list_with_dicts():
     """Resolves refs inside list items that are dicts."""
-    spec = {
-        "components": {
-            "schemas": {
-                "Tag": {"type": "string"}
-            }
-        }
-    }
+    spec = {"components": {"schemas": {"Tag": {"type": "string"}}}}
     schema = {
         "type": "array",
         "items": [{"$ref": "#/components/schemas/Tag"}, {"type": "integer"}],
@@ -123,9 +117,7 @@ def test_parse_parameters_with_ref():
             }
         }
     }
-    path_item = {
-        "parameters": [{"$ref": "#/components/parameters/limitParam"}]
-    }
+    path_item = {"parameters": [{"$ref": "#/components/parameters/limitParam"}]}
     result = _parse_parameters(path_item, "/items", spec)
     assert len(result) == 1
     assert result[0].name == "limit"
@@ -136,8 +128,18 @@ def test_parse_parameters_dedup_same_name():
     """Duplicate parameter names are deduplicated (first wins)."""
     path_item = {
         "parameters": [
-            {"name": "limit", "in": "query", "required": False, "schema": {"type": "integer"}},
-            {"name": "limit", "in": "query", "required": True, "schema": {"type": "integer"}},
+            {
+                "name": "limit",
+                "in": "query",
+                "required": False,
+                "schema": {"type": "integer"},
+            },
+            {
+                "name": "limit",
+                "in": "query",
+                "required": True,
+                "schema": {"type": "integer"},
+            },
         ]
     }
     result = _parse_parameters(path_item, "/items", {})
@@ -156,9 +158,7 @@ def test_parse_parameters_no_params():
 
 def test_parse_responses_default_status():
     """'default' response maps to status code 0 (wildcard)."""
-    responses_obj = {
-        "default": {"description": "Unexpected error"}
-    }
+    responses_obj = {"default": {"description": "Unexpected error"}}
     result = _parse_responses(responses_obj, {})
     assert 0 in result
     assert result[0].description == "Unexpected error"
@@ -187,9 +187,7 @@ def test_parse_responses_with_ref():
             }
         }
     }
-    responses_obj = {
-        "404": {"$ref": "#/components/responses/NotFound"}
-    }
+    responses_obj = {"404": {"$ref": "#/components/responses/NotFound"}}
     result = _parse_responses(responses_obj, spec)
     assert 404 in result
     assert result[404].description == "Not found"
@@ -256,9 +254,7 @@ def test_extract_example_no_match():
 def test_load_spec_json():
     """Load a JSON spec file."""
     spec_data = {"openapi": "3.0.0", "info": {"title": "Test", "version": "1.0.0"}}
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".json", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         json.dump(spec_data, f)
         tmp = f.name
     try:
@@ -273,9 +269,7 @@ def test_load_spec_yaml():
     import yaml
 
     spec_data = {"openapi": "3.0.0", "info": {"title": "YAML Test", "version": "1.0.0"}}
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yml", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
         yaml.dump(spec_data, f)
         tmp = f.name
     try:
@@ -305,9 +299,7 @@ def test_get_param_pattern_multiple_params():
 def test_parse_spec_minimal():
     """Parse a minimal spec with no paths."""
     spec_data = {"openapi": "3.0.0", "info": {"title": "Empty", "version": "0.0.0"}}
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".json", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         json.dump(spec_data, f)
         tmp = f.name
     try:
@@ -326,7 +318,12 @@ def test_parse_spec_shared_parameters():
         "paths": {
             "/items/{itemId}": {
                 "parameters": [
-                    {"name": "itemId", "in": "path", "required": True, "schema": {"type": "string"}}
+                    {
+                        "name": "itemId",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "string"},
+                    }
                 ],
                 "get": {
                     "operationId": "getItem",
@@ -339,9 +336,7 @@ def test_parse_spec_shared_parameters():
             }
         },
     }
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".json", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         json.dump(spec_data, f)
         tmp = f.name
     try:
@@ -353,5 +348,3 @@ def test_parse_spec_shared_parameters():
         assert any(p.name == "itemId" for p in del_ep.parameters)
     finally:
         Path(tmp).unlink()
-
-
