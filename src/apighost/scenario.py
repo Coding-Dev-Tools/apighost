@@ -22,20 +22,22 @@ def list_scenarios() -> list[dict]:
     for f in sorted(SCENARIO_DIR.glob("*.json")):
         try:
             data = json.loads(f.read_text())
-            scenarios.append({
-                "name": data.get("name", f.stem),
-                "description": data.get("description", ""),
-                "overrides": len(data.get("overrides", {})),
-                "path": str(f),
-            })
+            scenarios.append(
+                {
+                    "name": data.get("name", f.stem),
+                    "description": data.get("description", ""),
+                    "overrides": len(data.get("overrides", {})),
+                    "path": str(f),
+                }
+            )
         except (json.JSONDecodeError, OSError):
             continue
     return scenarios
 
 
-def save_scenario(name: str, description: str = "",
-                  overrides: dict[str, dict] | None = None,
-                  output_path: str | None = None) -> str:
+def save_scenario(
+    name: str, description: str = "", overrides: dict[str, dict] | None = None, output_path: str | None = None
+) -> str:
     """Save a scenario definition.
 
     Args:

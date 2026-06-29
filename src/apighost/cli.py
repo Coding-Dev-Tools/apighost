@@ -97,6 +97,7 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch):
     # Run with WSGI
     try:
         from werkzeug.serving import run_simple
+
         run_simple(host, port, app, use_reloader=False, threaded=True)
     except KeyboardInterrupt:
         _on_shutdown(recorder, name, spec)
@@ -130,6 +131,7 @@ def record(spec, output, port, requests):
 
     # Start server in background
     from werkzeug.serving import run_simple
+
     thread = threading.Thread(
         target=lambda: run_simple("127.0.0.1", port, app, use_reloader=False),
         daemon=True,
@@ -199,8 +201,7 @@ def replay(cassette, port, host):
         full_path = "/" + path
         for interaction in cassette_data.interactions:
             req_path = interaction.request_path.rstrip("/")
-            if (interaction.request_method == flask_request.method
-                    and req_path == full_path.rstrip("/")):
+            if interaction.request_method == flask_request.method and req_path == full_path.rstrip("/"):
                 return (
                     interaction.response_body,
                     interaction.response_status,
@@ -211,17 +212,19 @@ def replay(cassette, port, host):
 
     @app.route("/")
     def _replay_home():
-        return jsonify({
-            "service": f"APIGhost Replay - {cassette_data.name}",
-            "interactions": len(cassette_data.interactions),
-            "endpoints": list(set(f"{i.request_method} {i.request_path}"
-                                  for i in cassette_data.interactions)),
-        })
+        return jsonify(
+            {
+                "service": f"APIGhost Replay - {cassette_data.name}",
+                "interactions": len(cassette_data.interactions),
+                "endpoints": list(set(f"{i.request_method} {i.request_path}" for i in cassette_data.interactions)),
+            }
+        )
 
     click.echo(f"\n Replay server at http://{host}:{port}")
     click.echo("   Press Ctrl+C to stop\n")
 
     from werkzeug.serving import run_simple
+
     try:
         run_simple(host, port, app, use_reloader=False, threaded=True)
     except KeyboardInterrupt:
@@ -363,9 +366,9 @@ def generate(spec, output, name, max_endpoints):
 
     for ep in endpoints:
         key = f"{ep.method} {ep.path}"
-        body = generate_value(
-            next(iter(ep.responses.values())).schema_ref if ep.responses else None
-        ) or {"message": f"Auto-generated response for {key}"}
+        body = generate_value(next(iter(ep.responses.values())).schema_ref if ep.responses else None) or {
+            "message": f"Auto-generated response for {key}"
+        }
         overrides[key] = {"status": 200, "body": body}
         click.echo(f"   {ep.method:<6} {ep.path}")
 
@@ -389,4 +392,3 @@ def info():
 
 if __name__ == "__main__":
     cli()
-

@@ -175,9 +175,11 @@ class TestReplayRouteHandlers:
 
         # Capture the Flask app created inside replay()
         captured_app = None
+
         def capture_app(host, port, app, **kwargs):
             nonlocal captured_app
             captured_app = app
+
         mock_run.side_effect = capture_app
 
         result = runner.invoke(cli, ["replay", "replay-route-test"])
@@ -211,9 +213,11 @@ class TestReplayRouteHandlers:
         save_cassette("replay-route-test", [interaction], None)
 
         captured_app = None
+
         def capture_app(host, port, app, **kwargs):
             nonlocal captured_app
             captured_app = app
+
         mock_run.side_effect = capture_app
 
         result = runner.invoke(cli, ["replay", "replay-route-test"])
@@ -242,9 +246,11 @@ class TestReplayRouteHandlers:
         save_cassette("replay-route-test", [interaction], None)
 
         captured_app = None
+
         def capture_app(host, port, app, **kwargs):
             nonlocal captured_app
             captured_app = app
+
         mock_run.side_effect = capture_app
 
         result = runner.invoke(cli, ["replay", "replay-route-test"])
@@ -273,9 +279,11 @@ class TestReplayRouteHandlers:
         save_cassette("replay-route-test", [interaction], None)
 
         captured_app = None
+
         def capture_app(host, port, app, **kwargs):
             nonlocal captured_app
             captured_app = app
+
         mock_run.side_effect = capture_app
 
         result = runner.invoke(cli, ["replay", "replay-route-test"])
@@ -303,9 +311,11 @@ class TestReplayRouteHandlers:
         save_cassette("replay-route-test", [interaction], None)
 
         captured_app = None
+
         def capture_app(host, port, app, **kwargs):
             nonlocal captured_app
             captured_app = app
+
         mock_run.side_effect = capture_app
 
         result = runner.invoke(cli, ["replay", "replay-route-test"])

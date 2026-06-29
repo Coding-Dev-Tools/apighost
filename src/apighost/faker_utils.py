@@ -23,8 +23,8 @@ FORMAT_TO_FAKER: dict[str, callable] = {
     "phone": lambda: _faker.phone_number(),
     "int64": lambda: _faker.random_int(min=0, max=10**12),
     "int32": lambda: _faker.random_int(min=0, max=2**31 - 1),
-    "float": lambda: round(_faker.pyfloat(min_value=-10**6, max_value=10**6), 2),
-    "double": lambda: _faker.pyfloat(min_value=-10**12, max_value=10**12),
+    "float": lambda: round(_faker.pyfloat(min_value=-(10**6), max_value=10**6), 2),
+    "double": lambda: _faker.pyfloat(min_value=-(10**12), max_value=10**12),
     "binary": lambda: _faker.binary(16).hex(),
     "byte": lambda: _faker.binary(8).hex(),
     "password": lambda: _faker.password(),
@@ -115,7 +115,7 @@ def generate_value(schema: dict | None, property_name: str = "") -> Any:
         return _faker.random_int(min=minimum, max=maximum)
 
     if schema_type == "number":
-        return round(_faker.pyfloat(min_value=-10**6, max_value=10**6), 2)
+        return round(_faker.pyfloat(min_value=-(10**6), max_value=10**6), 2)
 
     if schema_type == "boolean":
         return _faker.boolean()

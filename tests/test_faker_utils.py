@@ -32,13 +32,15 @@ def test_generate_array():
 
 def test_generate_object():
     """Test generating an object from properties."""
-    val = generate_value({
-        "type": "object",
-        "properties": {
-            "name": {"type": "string"},
-            "age": {"type": "integer"},
+    val = generate_value(
+        {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+            },
         }
-    })
+    )
     assert isinstance(val, dict)
     assert "name" in val
     assert "age" in val
@@ -73,21 +75,23 @@ def test_generate_by_property_name():
 
 def test_generate_nested():
     """Test nested object generation."""
-    val = generate_value({
-        "type": "object",
-        "properties": {
-            "user": {
-                "type": "object",
-                "properties": {
-                    "name": {"type": "string"},
-                    "contacts": {
-                        "type": "array",
-                        "items": {"type": "string", "format": "email"},
-                    }
+    val = generate_value(
+        {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "contacts": {
+                            "type": "array",
+                            "items": {"type": "string", "format": "email"},
+                        },
+                    },
                 }
-            }
+            },
         }
-    })
+    )
     assert isinstance(val["user"]["name"], str)
     assert isinstance(val["user"]["contacts"], list)
     assert "@" in val["user"]["contacts"][0]
@@ -141,12 +145,7 @@ def test_generate_number():
 
 def test_generate_array_with_bounds():
     """Test array with minItems/maxItems constraints."""
-    val = generate_value({
-        "type": "array",
-        "items": {"type": "string"},
-        "minItems": 2,
-        "maxItems": 4
-    })
+    val = generate_value({"type": "array", "items": {"type": "string"}, "minItems": 2, "maxItems": 4})
     assert isinstance(val, list)
     assert 2 <= len(val) <= 4
     assert all(isinstance(v, str) for v in val)
@@ -154,13 +153,15 @@ def test_generate_array_with_bounds():
 
 def test_generate_object_required_not_in_properties():
     """Test object where required field is not listed in properties."""
-    val = generate_value({
-        "type": "object",
-        "properties": {
-            "name": {"type": "string"},
-        },
-        "required": ["name", "extra_field"]
-    })
+    val = generate_value(
+        {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+            },
+            "required": ["name", "extra_field"],
+        }
+    )
     assert isinstance(val, dict)
     assert "name" in val
     assert "extra_field" in val

@@ -75,14 +75,7 @@ def test_parse_json_spec():
     spec_dict = {
         "openapi": "3.0.0",
         "info": {"title": "JSON Test API", "version": "1.0.0"},
-        "paths": {
-            "/items": {
-                "get": {
-                    "operationId": "listItems",
-                    "responses": {"200": {"description": "OK"}}
-                }
-            }
-        }
+        "paths": {"/items": {"get": {"operationId": "listItems", "responses": {"200": {"description": "OK"}}}}},
     }
     with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         json.dump(spec_dict, f)

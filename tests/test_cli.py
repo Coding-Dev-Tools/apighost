@@ -159,20 +159,35 @@ class TestScenario:
 
     def test_cli_scenario_edit(self, runner):
         """Test 'apighost scenario edit'."""
-        result = runner.invoke(cli, [
-            "scenario", "edit", self.SCENARIO_NAME,
-            "GET /pets", "--status", "404",
-            "--body", '{"error":"not found"}',
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "scenario",
+                "edit",
+                self.SCENARIO_NAME,
+                "GET /pets",
+                "--status",
+                "404",
+                "--body",
+                '{"error":"not found"}',
+            ],
+        )
         assert result.exit_code == 0
         assert self.SCENARIO_NAME in result.output
 
     def test_cli_scenario_edit_missing(self, runner):
         """Test 'apighost scenario edit' with nonexistent scenario."""
-        result = runner.invoke(cli, [
-            "scenario", "edit", "nonexistent-scenario-xyz",
-            "GET /test", "--status", "200",
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "scenario",
+                "edit",
+                "nonexistent-scenario-xyz",
+                "GET /test",
+                "--status",
+                "200",
+            ],
+        )
         assert result.exit_code != 0
         assert "not found" in result.output.lower()
 
@@ -228,9 +243,12 @@ class TestMainModule:
         """Test `python -m apighost --version` outputs version."""
         import subprocess
         import sys
+
         result = subprocess.run(
             [sys.executable, "-m", "apighost", "--version"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         assert result.returncode == 0
         assert "apighost" in result.stdout
@@ -239,9 +257,12 @@ class TestMainModule:
         """Test `python -m apighost --help` lists commands."""
         import subprocess
         import sys
+
         result = subprocess.run(
             [sys.executable, "-m", "apighost", "--help"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         assert result.returncode == 0
         assert "serve" in result.stdout
@@ -257,7 +278,9 @@ class TestGenerateMaxEndpoints:
         assert result.exit_code == 0
         # Petstore fixture has 5 endpoints, all should be listed
         lines = [line.strip() for line in result.output.split("\n") if line.strip()]
-        endpoint_lines = [line for line in lines if line.startswith("GET") or line.startswith("POST") or line.startswith("DELETE")]
+        endpoint_lines = [
+            line for line in lines if line.startswith("GET") or line.startswith("POST") or line.startswith("DELETE")
+        ]
         assert len(endpoint_lines) == 5
         assert "5 endpoint responses" in result.output
 
@@ -266,7 +289,9 @@ class TestGenerateMaxEndpoints:
         result = runner.invoke(cli, ["generate", PETSTORE_YAML, "--max-endpoints", "2"])
         assert result.exit_code == 0
         lines = [line.strip() for line in result.output.split("\n") if line.strip()]
-        endpoint_lines = [line for line in lines if line.startswith("GET") or line.startswith("POST") or line.startswith("DELETE")]
+        endpoint_lines = [
+            line for line in lines if line.startswith("GET") or line.startswith("POST") or line.startswith("DELETE")
+        ]
         assert len(endpoint_lines) == 2
         assert "2 endpoint responses" in result.output
         assert "limiting to 2/5" in result.output
@@ -291,14 +316,21 @@ class TestGenerateOutput:
     def test_cli_generate_with_output(self, runner, tmp_path):
         """Test 'apighost generate' with custom output path."""
         output_file = tmp_path / "custom-gen.json"
-        result = runner.invoke(cli, [
-            "generate", PETSTORE_YAML,
-            "-o", str(output_file),
-            "-n", "output-test",
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "generate",
+                PETSTORE_YAML,
+                "-o",
+                str(output_file),
+                "-n",
+                "output-test",
+            ],
+        )
         assert result.exit_code == 0
         assert output_file.exists(), "Output file should be written to custom path"
         import json
+
         data = json.loads(output_file.read_text())
         assert data["name"] == "output-test"
         assert "overrides" in data
@@ -307,11 +339,17 @@ class TestGenerateOutput:
         """Test 'apighost generate --output' creates parent dirs."""
         nested_dir = tmp_path / "sub" / "dir"
         nested_file = nested_dir / "gen.json"
-        result = runner.invoke(cli, [
-            "generate", PETSTORE_YAML,
-            "-o", str(nested_file),
-            "-n", "nested-gen",
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "generate",
+                PETSTORE_YAML,
+                "-o",
+                str(nested_file),
+                "-n",
+                "nested-gen",
+            ],
+        )
         assert result.exit_code == 0
         assert nested_file.exists(), "Parent dirs should be auto-created"
 
@@ -324,10 +362,19 @@ class TestScenarioEditRawBody:
     def test_cli_scenario_edit_raw_string_body(self, runner):
         """Test editing scenario with a raw string body (not JSON)."""
         runner.invoke(cli, ["scenario", "create", self.SCENARIO_NAME, "-d", "Raw body test"])
-        result = runner.invoke(cli, [
-            "scenario", "edit", self.SCENARIO_NAME,
-            "GET /raw", "--status", "200", "--body", "plain text body",
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "scenario",
+                "edit",
+                self.SCENARIO_NAME,
+                "GET /raw",
+                "--status",
+                "200",
+                "--body",
+                "plain text body",
+            ],
+        )
         assert result.exit_code == 0
         assert self.SCENARIO_NAME in result.output
         runner.invoke(cli, ["scenario", "delete", self.SCENARIO_NAME])
@@ -340,6 +387,7 @@ class TestMainModuleCoverage:
         """Test __main__.py via runpy triggers CLI --version."""
         import runpy
         import sys
+
         saved_argv = sys.argv
         try:
             sys.argv = ["apighost", "--version"]

@@ -54,10 +54,7 @@ def _resolve_schema_refs(schema: dict | None, spec: dict) -> dict | None:
         elif isinstance(value, dict):
             resolved[key] = _resolve_schema_refs(value, spec)
         elif isinstance(value, list):
-            resolved[key] = [
-                _resolve_schema_refs(item, spec) if isinstance(item, dict) else item
-                for item in value
-            ]
+            resolved[key] = [_resolve_schema_refs(item, spec) if isinstance(item, dict) else item for item in value]
         else:
             resolved[key] = value
     return resolved
@@ -75,13 +72,15 @@ def _parse_parameters(path_item: dict, path: str, spec: dict) -> list[Parameter]
         name = resolved.get("name", "")
         if name not in seen:
             seen.add(name)
-            params.append(Parameter(
-                name=name,
-                location=resolved.get("in", "query"),
-                required=resolved.get("required", False),
-                schema_ref=resolved.get("schema", {}),
-                example=resolved.get("example") or resolved.get("schema", {}).get("example"),
-            ))
+            params.append(
+                Parameter(
+                    name=name,
+                    location=resolved.get("in", "query"),
+                    required=resolved.get("required", False),
+                    schema_ref=resolved.get("schema", {}),
+                    example=resolved.get("example") or resolved.get("schema", {}).get("example"),
+                )
+            )
 
     return params
 
@@ -188,9 +187,7 @@ def parse_spec(path: str | Path) -> ApiSpec:
                 content = rb.get("content", {})
                 if content:
                     content_type = list(content.keys())[0]
-                    endpoint.request_body_schema = _resolve_schema_refs(
-                        content[content_type].get("schema", {}), raw
-                    )
+                    endpoint.request_body_schema = _resolve_schema_refs(content[content_type].get("schema", {}), raw)
 
             spec.endpoints.append(endpoint)
 

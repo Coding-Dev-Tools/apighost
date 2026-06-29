@@ -7,14 +7,17 @@ The real require_license(tool_name, daily_limit=50) checks rate limits and
 calls sys.exit(1) when the free-tier daily cap is reached. We replace it
 with a stub that always returns a LicenseStatus indicating the tool is allowed.
 """
+
 import sys
 from unittest.mock import MagicMock
 
 # --- Build a mock module that matches the real package API ---
 
+
 # Stub LicenseStatus that always reports "allowed"
 class _MockLicenseStatus:
     """Mimics revenueholdings_license.LicenseStatus for test env."""
+
     def __init__(self, tool_name="apighost"):
         self.allowed = True
         self.limited = False
@@ -22,6 +25,7 @@ class _MockLicenseStatus:
         self.daily_limit = -1  # unlimited
         self.error = None
         self.tier = "pro"
+
 
 _mock_module = MagicMock()
 
