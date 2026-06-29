@@ -24,9 +24,11 @@ from .vcr import Recorder, list_cassettes, load_cassette
 try:
     from revenueholdings_license import require_license
 except ImportError:
+
     def require_license(tool) -> Any:
         def decorator(func) -> Any:
             return func
+
         return decorator
 
 
@@ -81,7 +83,9 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch) -> 
     if scenario:
         try:
             scenario_obj = load_scenario(scenario)
-            click.echo(f"   Scenario: {scenario_obj.name} ({len(scenario_obj.overrides)} overrides)")
+            click.echo(
+                f"   Scenario: {scenario_obj.name} ({len(scenario_obj.overrides)} overrides)"
+            )
         except FileNotFoundError:
             click.echo(f" Scenario '{scenario}' not found. Using default.", err=True)
 
@@ -109,6 +113,7 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch) -> 
     # Run with WSGI
     try:
         from werkzeug.serving import run_simple
+
         run_simple(host, port, app, use_reloader=False, threaded=True)
     except KeyboardInterrupt:
         _on_shutdown(recorder, name, spec)
@@ -120,14 +125,18 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch) -> 
 def _on_shutdown(recorder, cassette_name, spec_path) -> None:
     """Handle server shutdown - save cassette if recording."""
     if recorder and recorder.count > 0:
-        path = recorder.save(cassette_name or f"recording-{int(time.time())}", spec_path)
+        path = recorder.save(
+            cassette_name or f"recording-{int(time.time())}", spec_path
+        )
         click.echo(f"\n Recorded {recorder.count} interactions → {path}")
     click.echo("\n Server stopped.")
 
 
 @cli.command()
 @click.argument("spec", type=click.Path(exists=True))
-@click.option("--output", "-o", default=None, help="Output file for cassette (default: auto)")
+@click.option(
+    "--output", "-o", default=None, help="Output file for cassette (default: auto)"
+)
 @click.option("--port", "-p", default=8081, help="Port for the recording server")
 @click.option("--requests", "-n", default=5, help="Number of sample requests to make")
 def record(spec, output, port, requests) -> Any:
@@ -142,6 +151,7 @@ def record(spec, output, port, requests) -> Any:
 
     # Start server in background
     from werkzeug.serving import run_simple
+
     thread = threading.Thread(
         target=lambda: run_simple("127.0.0.1", port, app, use_reloader=False),
         daemon=True,
@@ -173,7 +183,9 @@ def record(spec, output, port, requests) -> Any:
 
     # Determine output
     if not output:
-        output = f"cassette-{api_spec.title.replace(' ', '-').lower()}-{int(time.time())}"
+        output = (
+            f"cassette-{api_spec.title.replace(' ', '-').lower()}-{int(time.time())}"
+        )
 
     path = recorder.save(output, spec)
     click.echo(f"\n Recorded {recorder.count} interactions → {path}")
@@ -211,29 +223,41 @@ def replay(cassette, port, host) -> Any:
         full_path = "/" + path
         for interaction in cassette_data.interactions:
             req_path = interaction.request_path.rstrip("/")
-            if (interaction.request_method == flask_request.method
-                    and req_path == full_path.rstrip("/")):
+            if (
+                interaction.request_method == flask_request.method
+                and req_path == full_path.rstrip("/")
+            ):
                 return (
                     interaction.response_body,
                     interaction.response_status,
-                    interaction.response_headers or {"Content-Type": "application/json"},
+                    interaction.response_headers
+                    or {"Content-Type": "application/json"},
                 )
 
-        return jsonify({"error": "No matching recorded interaction", "path": full_path}), 404
+        return jsonify(
+            {"error": "No matching recorded interaction", "path": full_path}
+        ), 404
 
     @app.route("/")
     def _replay_home() -> Any:
-        return jsonify({
-            "service": f"APIGhost Replay - {cassette_data.name}",
-            "interactions": len(cassette_data.interactions),
-            "endpoints": list(set(f"{i.request_method} {i.request_path}"
-                                  for i in cassette_data.interactions)),
-        })
+        return jsonify(
+            {
+                "service": f"APIGhost Replay - {cassette_data.name}",
+                "interactions": len(cassette_data.interactions),
+                "endpoints": list(
+                    set(
+                        f"{i.request_method} {i.request_path}"
+                        for i in cassette_data.interactions
+                    )
+                ),
+            }
+        )
 
     click.echo(f"\n Replay server at http://{host}:{port}")
     click.echo("   Press Ctrl+C to stop\n")
 
     from werkzeug.serving import run_simple
+
     try:
         run_simple(host, port, app, use_reloader=False, threaded=True)
     except KeyboardInterrupt:
@@ -346,7 +370,9 @@ def scenario_delete(name) -> None:
 
 @cli.command()
 @click.argument("spec", type=click.Path(exists=True))
-@click.option("--output", "-o", default=None, help="Output path for the generated scenario")
+@click.option(
+    "--output", "-o", default=None, help="Output path for the generated scenario"
+)
 @click.option("--name", "-n", default=None, help="Scenario name")
 def generate(spec, output, name) -> None:
     """Generate sample data and create a scenario from an OpenAPI spec."""
@@ -372,7 +398,9 @@ def generate(spec, output, name) -> None:
         overrides[key] = {"status": 200, "body": body}
         click.echo(f"   {ep.method:<6} {ep.path}")
 
-    path = save_scenario(scenario_name, f"Auto-generated from {spec}", overrides, output_path=output)
+    path = save_scenario(
+        scenario_name, f"Auto-generated from {spec}", overrides, output_path=output
+    )
     click.echo(f"\n Generated {len(overrides)} endpoint responses → {path}")
 
 
@@ -392,4 +420,3 @@ def info() -> None:
 
 if __name__ == "__main__":
     cli()
-
