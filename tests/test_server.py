@@ -150,6 +150,7 @@ def test_head_request(petstore_spec):
 def test_latency_zero_no_delay(petstore_spec):
     """Test that zero latency (default) adds no delay."""
     import time
+
     app = create_app(petstore_spec, latency_range=(0, 0))
     client = app.test_client()
     start = time.monotonic()
@@ -162,6 +163,7 @@ def test_latency_zero_no_delay(petstore_spec):
 def test_latency_applies_delay(petstore_spec):
     """Test that latency_range adds a measurable delay to responses."""
     import time
+
     app = create_app(petstore_spec, latency_range=(0.05, 0.1))
     client = app.test_client()
     start = time.monotonic()
@@ -173,9 +175,11 @@ def test_latency_applies_delay(petstore_spec):
 
 # --- Internal helper tests (coverage gaps) ---
 
+
 def test_extract_path_params_no_match():
     """_extract_path_params returns {} when path doesn't match (covers line 30)."""
     from apighost.server import _extract_path_params
+
     result = _extract_path_params("/users/{id}", "/items/42")
     assert result == {}
 
@@ -185,6 +189,7 @@ def test_make_response_with_dict():
     from flask import Flask
 
     from apighost.server import _make_response
+
     app = Flask(__name__)
     with app.app_context():
         resp = _make_response(201, {"id": 1, "name": "test"})
@@ -196,6 +201,7 @@ def test_make_response_with_dict():
 def test_make_response_with_string():
     """_make_response with string body returns Response object (covers line 36)."""
     from apighost.server import _make_response
+
     resp = _make_response(200, "plain text", content_type="text/plain")
     assert resp.status_code == 200
     assert resp.get_data(as_text=True) == "plain text"
@@ -205,6 +211,7 @@ def test_build_response_fallback_without_example_or_schema():
     """_build_response_for_endpoint fallback when no response_def or schema (covers line 66)."""
     from apighost.schema import Endpoint
     from apighost.server import _build_response_for_endpoint
+
     ep = Endpoint(path="/fallback", method="get", responses={})
     body, status = _build_response_for_endpoint(ep, scenario=None, params={})
     assert status in (200,)
@@ -216,14 +223,19 @@ def test_build_response_with_schema_ref():
     from apighost.schema import Endpoint
     from apighost.schema import Response as ApiResponse
     from apighost.server import _build_response_for_endpoint
+
     ep = Endpoint(
-        path="/schema-only", method="get",
+        path="/schema-only",
+        method="get",
         responses={
             200: ApiResponse(
                 status_code=200,
-                schema_ref={"type": "object", "properties": {"id": {"type": "integer"}}},
+                schema_ref={
+                    "type": "object",
+                    "properties": {"id": {"type": "integer"}},
+                },
             )
-        }
+        },
     )
     body, status = _build_response_for_endpoint(ep, scenario=None, params={})
     assert status == 200
