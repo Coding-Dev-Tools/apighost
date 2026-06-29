@@ -26,8 +26,8 @@ FORMAT_TO_FAKER: dict[str, Callable[[], Any]] = {
     "phone": lambda: _faker.phone_number(),
     "int64": lambda: _faker.random_int(min=0, max=10**12),
     "int32": lambda: _faker.random_int(min=0, max=2**31 - 1),
-    "float": lambda: round(_faker.pyfloat(min_value=-10**6, max_value=10**6), 2),
-    "double": lambda: _faker.pyfloat(min_value=-10**12, max_value=10**12),
+    "float": lambda: round(_faker.pyfloat(min_value=-(10**6), max_value=10**6), 2),
+    "double": lambda: _faker.pyfloat(min_value=-(10**12), max_value=10**12),
     "binary": lambda: _faker.binary(16).hex(),
     "byte": lambda: _faker.binary(8).hex(),
     "password": lambda: _faker.password(),
@@ -58,7 +58,9 @@ PROPERTY_HINTS: dict[str, Callable[[], Any]] = {
     "type": lambda: random.choice(["user", "admin", "moderator", "guest"]),
     "role": lambda: random.choice(["admin", "editor", "viewer", "contributor"]),
     "slug": lambda: _faker.slug(),
-    "avatar": lambda: f"https://api.dicebear.com/7.x/avataaars/svg?seed={_faker.user_name()}",
+    "avatar": lambda: (
+        f"https://api.dicebear.com/7.x/avataaars/svg?seed={_faker.user_name()}"
+    ),
     "image": lambda: f"https://picsum.photos/seed/{_faker.random_int()}/400/300",
     "url": lambda: _faker.url(),
     "website": lambda: _faker.url(),
@@ -107,7 +109,9 @@ def generate_value(schema: dict | None, property_name: str = "") -> Any:
 
     if schema_type == "string":
         if "minLength" in schema and "maxLength" in schema:
-            return _faker.pystr(min_chars=schema["minLength"], max_chars=schema["maxLength"])
+            return _faker.pystr(
+                min_chars=schema["minLength"], max_chars=schema["maxLength"]
+            )
         if schema.get("pattern"):
             return _faker.pystr(min_chars=8, max_chars=16)
         return _faker.word()
@@ -118,7 +122,7 @@ def generate_value(schema: dict | None, property_name: str = "") -> Any:
         return _faker.random_int(min=minimum, max=maximum)
 
     if schema_type == "number":
-        return round(_faker.pyfloat(min_value=-10**6, max_value=10**6), 2)
+        return round(_faker.pyfloat(min_value=-(10**6), max_value=10**6), 2)
 
     if schema_type == "boolean":
         return _faker.boolean()
