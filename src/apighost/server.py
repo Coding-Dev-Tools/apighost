@@ -31,7 +31,9 @@ def _extract_path_params(path_template: str, actual_path: str) -> dict[str, str]
     return {}
 
 
-def _make_response(status: int, body: Any, content_type: str = "application/json") -> Response:
+def _make_response(
+    status: int, body: Any, content_type: str = "application/json"
+) -> Response:
     """Build a Flask Response."""
     if isinstance(body, str):
         return Response(body, status=status, content_type=content_type)
@@ -40,9 +42,11 @@ def _make_response(status: int, body: Any, content_type: str = "application/json
     return response
 
 
-def _build_response_for_endpoint(endpoint: Endpoint,
-                                 scenario: Scenario | None = None,
-                                 params: dict[str, str] | None = None) -> tuple[Any, int]:
+def _build_response_for_endpoint(
+    endpoint: Endpoint,
+    scenario: Scenario | None = None,
+    params: dict[str, str] | None = None,
+) -> tuple[Any, int]:
     """Build a realistic response for an endpoint, respecting scenario overrides."""
     key = f"{endpoint.method} {endpoint.path}"
 
@@ -69,8 +73,12 @@ def _build_response_for_endpoint(endpoint: Endpoint,
     return {"message": f"{endpoint.method} {endpoint.path} — mock response"}, status
 
 
-def create_app(spec: ApiSpec, scenario: Scenario | None = None,
-               recorder: Any = None, latency_range: tuple[float, float] = (0, 0)) -> Flask:
+def create_app(
+    spec: ApiSpec,
+    scenario: Scenario | None = None,
+    recorder: Any = None,
+    latency_range: tuple[float, float] = (0, 0),
+) -> Flask:
     """Create a Flask app from a parsed OpenAPI spec."""
     app = Flask(__name__)
 
@@ -83,18 +91,27 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
     @app.route("/")
     def _apighost_home() -> Any:
         """Generated API home — list available routes."""
-        return jsonify({
-            "service": spec.title or "APIGhost Mock Server",
-            "version": spec.version,
-            "servers": spec.servers,
-            "description": spec.description or "Mock API server generated from OpenAPI spec",
-            "endpoints": routes,
-            "scenario": scenario.name if scenario else "default",
-        })
+        return jsonify(
+            {
+                "service": spec.title or "APIGhost Mock Server",
+                "version": spec.version,
+                "servers": spec.servers,
+                "description": spec.description
+                or "Mock API server generated from OpenAPI spec",
+                "endpoints": routes,
+                "scenario": scenario.name if scenario else "default",
+            }
+        )
 
     @app.route("/_apighost/health")
     def _apighost_health() -> Any:
-        return jsonify({"status": "ok", "endpoints": len(spec.endpoints), "recording": recorder is not None})
+        return jsonify(
+            {
+                "status": "ok",
+                "endpoints": len(spec.endpoints),
+                "recording": recorder is not None,
+            }
+        )
 
     # Register each endpoint
     for ep in spec.endpoints:
@@ -138,6 +155,7 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
                     )
 
                 return _make_response(status, body)
+
             return handler
 
         app.add_url_rule(
