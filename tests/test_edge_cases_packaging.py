@@ -32,16 +32,22 @@ class TestPackagingQuality:
         with open(pyproject, "rb") as f:
             data = tomllib.load(f)
         pkg_data = data.get("tool", {}).get("setuptools", {}).get("package-data", {})
-        assert "apighost" in pkg_data, \
+        assert "apighost" in pkg_data, (
             "Expected [tool.setuptools.package-data] section for 'apighost'"
-        assert "py.typed" in pkg_data["apighost"], \
+        )
+        assert "py.typed" in pkg_data["apighost"], (
             f"Expected 'py.typed' in package-data, got {pkg_data['apighost']}"
+        )
 
     def test_ruff_known_first_party(self):
         """ruff known-first-party should be ['apighost'], not ['*']."""
         pyproject = Path(__file__).parent.parent / "pyproject.toml"
         with open(pyproject, "rb") as f:
             data = tomllib.load(f)
-        isort_cfg = data.get("tool", {}).get("ruff", {}).get("lint", {}).get("isort", {})
+        isort_cfg = (
+            data.get("tool", {}).get("ruff", {}).get("lint", {}).get("isort", {})
+        )
         kfp = isort_cfg.get("known-first-party", [])
-        assert kfp == ["apighost"], f"known-first-party should be ['apighost'], got {kfp}"
+        assert kfp == ["apighost"], (
+            f"known-first-party should be ['apighost'], got {kfp}"
+        )
