@@ -2,8 +2,9 @@
 
 import json
 import tempfile
-from apighost.parser import _infer_type, get_param_pattern, parse_spec
 from pathlib import Path
+
+from apighost.parser import _infer_type, get_param_pattern, parse_spec
 
 from . import PETSTORE_YAML
 
@@ -79,10 +80,10 @@ def test_parse_json_spec():
             "/items": {
                 "get": {
                     "operationId": "listItems",
-                    "responses": {"200": {"description": "OK"}}
+                    "responses": {"200": {"description": "OK"}},
                 }
             }
-        }
+        },
     }
     with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         json.dump(spec_dict, f)
@@ -100,7 +101,10 @@ def test_parse_json_spec():
 def test_get_param_pattern():
     """Test path parameter conversion for Flask."""
     assert get_param_pattern("/users/{id}") == "/users/<id>"
-    assert get_param_pattern("/users/{userId}/posts/{postId}") == "/users/<userId>/posts/<postId>"
+    assert (
+        get_param_pattern("/users/{userId}/posts/{postId}")
+        == "/users/<userId>/posts/<postId>"
+    )
     assert get_param_pattern("/items") == "/items"
 
 

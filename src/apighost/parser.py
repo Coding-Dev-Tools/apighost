@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import json
 import re
-import yaml
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 from .schema import ApiSpec, Endpoint, Parameter, Response
 
@@ -45,7 +46,7 @@ def _resolve_schema_refs(schema: dict | None, spec: dict) -> dict | None:
     """Recursively resolve all $ref pointers in a schema tree."""
     if not schema:
         return schema
-    resolved = {}
+    resolved: dict[Any, Any] = {}
     for key, value in schema.items():
         if key == "$ref" and isinstance(value, str):
             ref_target = _resolve_ref(value, spec)
@@ -75,13 +76,16 @@ def _parse_parameters(path_item: dict, path: str, spec: dict) -> list[Parameter]
         name = resolved.get("name", "")
         if name not in seen:
             seen.add(name)
-            params.append(Parameter(
-                name=name,
-                location=resolved.get("in", "query"),
-                required=resolved.get("required", False),
-                schema_ref=resolved.get("schema", {}),
-                example=resolved.get("example") or resolved.get("schema", {}).get("example"),
-            ))
+            params.append(
+                Parameter(
+                    name=name,
+                    location=resolved.get("in", "query"),
+                    required=resolved.get("required", False),
+                    schema_ref=resolved.get("schema", {}),
+                    example=resolved.get("example")
+                    or resolved.get("schema", {}).get("example"),
+                )
+            )
 
     return params
 

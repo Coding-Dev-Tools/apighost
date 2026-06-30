@@ -24,19 +24,23 @@ def list_cassettes() -> list[dict]:
     for f in sorted(CASSETTE_DIR.glob("*.json")):
         try:
             data = json.loads(f.read_text())
-            cassettes.append({
-                "name": f.stem,
-                "path": str(f),
-                "interactions": len(data.get("interactions", [])),
-                "spec": data.get("spec", ""),
-                "size": f.stat().st_size,
-            })
+            cassettes.append(
+                {
+                    "name": f.stem,
+                    "path": str(f),
+                    "interactions": len(data.get("interactions", [])),
+                    "spec": data.get("spec", ""),
+                    "size": f.stat().st_size,
+                }
+            )
         except (json.JSONDecodeError, OSError):
             continue
     return cassettes
 
 
-def save_cassette(name: str, interactions: list[CassetteInteraction], spec_path: str = "") -> str:
+def save_cassette(
+    name: str, interactions: list[CassetteInteraction], spec_path: str = ""
+) -> str:
     """Save recorded interactions to a cassette file."""
     _ensure_dir()
     safe_name = name.replace(" ", "_").replace("/", "-")
@@ -103,24 +107,35 @@ class Recorder:
     def __init__(self):
         self.interactions: list[CassetteInteraction] = []
 
-    def record(self, request_method: str, request_path: str,
-               request_headers: dict, request_body: str | None,
-               response_status: int, response_headers: dict,
-               response_body: str) -> None:
+    def record(
+        self,
+        request_method: str,
+        request_path: str,
+        request_headers: dict,
+        request_body: str | None,
+        response_status: int,
+        response_headers: dict,
+        response_body: str,
+    ) -> None:
         """Record a single HTTP interaction."""
         # Strip sensitive headers
-        safe_headers = {k: v for k, v in request_headers.items()
-                        if k.lower() not in ("authorization", "cookie", "set-cookie", "x-api-key")}
+        safe_headers = {
+            k: v
+            for k, v in request_headers.items()
+            if k.lower() not in ("authorization", "cookie", "set-cookie", "x-api-key")
+        }
 
-        self.interactions.append(CassetteInteraction(
-            request_method=request_method,
-            request_path=request_path,
-            request_headers=safe_headers,
-            request_body=request_body,
-            response_status=response_status,
-            response_headers=response_headers,
-            response_body=response_body,
-        ))
+        self.interactions.append(
+            CassetteInteraction(
+                request_method=request_method,
+                request_path=request_path,
+                request_headers=safe_headers,
+                request_body=request_body,
+                response_status=response_status,
+                response_headers=response_headers,
+                response_body=response_body,
+            )
+        )
 
     def save(self, name: str, spec_path: str = "") -> str:
         """Save recorded interactions."""

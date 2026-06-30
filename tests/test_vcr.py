@@ -1,7 +1,7 @@
 """Tests for VCR cassette module."""
 
-
 import pytest
+
 from apighost.vcr import CassetteInteraction, Recorder, load_cassette
 
 
@@ -35,8 +35,15 @@ def test_recorder_clear():
 def test_recorder_strips_sensitive_headers():
     """Test that sensitive headers are stripped from recording."""
     r = Recorder()
-    r.record("GET", "/secure", {"Authorization": "Bearer xxx", "X-Custom": "ok"},
-             None, 200, {}, "")
+    r.record(
+        "GET",
+        "/secure",
+        {"Authorization": "Bearer xxx", "X-Custom": "ok"},
+        None,
+        200,
+        {},
+        "",
+    )
     recorded = r.interactions[0]
     assert "authorization" not in recorded.request_headers
     assert "Authorization" not in recorded.request_headers
@@ -81,6 +88,7 @@ def test_cassette_interaction_dataclass():
 def test_save_and_load_cassette_with_name():
     """Test saving and loading a named cassette via list_cassettes."""
     from apighost.vcr import Recorder, list_cassettes, load_cassette, save_cassette
+
     r = Recorder()
     r.record("GET", "/named", {}, None, 200, {}, '"named"')
     path = save_cassette("named-cassette", r.interactions, "/path/to/spec.yaml")
@@ -96,7 +104,13 @@ def test_save_and_load_cassette_with_name():
 
 def test_list_cassettes_skips_corrupted_json():
     """list_cassettes skips files with invalid JSON (covers lines 34-35)."""
-    from apighost.vcr import CASSETTE_DIR, CassetteInteraction, list_cassettes, save_cassette
+    from apighost.vcr import (
+        CASSETTE_DIR,
+        CassetteInteraction,
+        list_cassettes,
+        save_cassette,
+    )
+
     # Save a valid cassette
     ci = CassetteInteraction("GET", "/valid", {}, None, 200, {}, '"ok"')
     save_cassette("valid-cassette", [ci], "")

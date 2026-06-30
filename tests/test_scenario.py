@@ -1,14 +1,24 @@
 """Tests for scenario management."""
 
 import pytest
-from apighost.scenario import delete_scenario, list_scenarios, load_scenario, save_scenario
+
+from apighost.scenario import (
+    delete_scenario,
+    list_scenarios,
+    load_scenario,
+    save_scenario,
+)
 
 
 def test_save_and_load_scenario():
     """Test roundtrip save/load scenario."""
-    path = save_scenario("test-scenario", "A test scenario", {
-        "GET /users": {"status": 404, "body": {"error": "not found"}},
-    })
+    path = save_scenario(
+        "test-scenario",
+        "A test scenario",
+        {
+            "GET /users": {"status": 404, "body": {"error": "not found"}},
+        },
+    )
     assert path is not None
 
     sc = load_scenario("test-scenario")
@@ -44,6 +54,7 @@ def test_load_nonexistent_scenario():
 def test_list_scenarios_skips_corrupted_json():
     """list_scenarios skips files with invalid JSON (covers lines 31-32)."""
     from apighost.scenario import SCENARIO_DIR
+
     save_scenario("good-scenario", "valid")
     # Write corrupted JSON
     bad_file = SCENARIO_DIR / "corrupted.json"

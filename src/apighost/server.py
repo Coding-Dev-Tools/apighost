@@ -6,10 +6,11 @@ import json
 import logging
 import random
 import re
-import time
 from collections.abc import Callable
 from flask import Flask, Response, jsonify, request
 from typing import Any
+
+from flask import Flask, Response, jsonify, request
 
 from .faker_utils import generate_status_code, generate_value
 from .parser import get_param_pattern
@@ -30,16 +31,22 @@ def _extract_path_params(path_template: str, actual_path: str) -> dict[str, str]
     return {}
 
 
-def _make_response(status: int, body: Any, content_type: str = "application/json") -> Response:
+def _make_response(
+    status: int, body: Any, content_type: str = "application/json"
+) -> Response:
     """Build a Flask Response."""
     if isinstance(body, str):
         return Response(body, status=status, content_type=content_type)
-    return jsonify(body), status
+    response = jsonify(body)
+    response.status_code = status
+    return response
 
 
-def _build_response_for_endpoint(endpoint: Endpoint,
-                                 scenario: Scenario | None = None,
-                                 params: dict[str, str] | None = None) -> tuple[Any, int]:
+def _build_response_for_endpoint(
+    endpoint: Endpoint,
+    scenario: Scenario | None = None,
+    params: dict[str, str] | None = None,
+) -> tuple[Any, int]:
     """Build a realistic response for an endpoint, respecting scenario overrides."""
     key = f"{endpoint.method} {endpoint.path}"
 
@@ -66,8 +73,12 @@ def _build_response_for_endpoint(endpoint: Endpoint,
     return {"message": f"{endpoint.method} {endpoint.path} — mock response"}, status
 
 
-def create_app(spec: ApiSpec, scenario: Scenario | None = None,
-               recorder: Any = None, latency_range: tuple[float, float] = (0, 0)) -> Flask:
+def create_app(
+    spec: ApiSpec,
+    scenario: Scenario | None = None,
+    recorder: Any = None,
+    latency_range: tuple[float, float] = (0, 0),
+) -> Flask:
     """Create a Flask app from a parsed OpenAPI spec."""
     app = Flask(__name__)
 
@@ -78,20 +89,29 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
     routes: list[dict] = []
 
     @app.route("/")
-    def _apighost_home():
+    def _apighost_home() -> Any:
         """Generated API home — list available routes."""
-        return jsonify({
-            "service": spec.title or "APIGhost Mock Server",
-            "version": spec.version,
-            "servers": spec.servers,
-            "description": spec.description or "Mock API server generated from OpenAPI spec",
-            "endpoints": routes,
-            "scenario": scenario.name if scenario else "default",
-        })
+        return jsonify(
+            {
+                "service": spec.title or "APIGhost Mock Server",
+                "version": spec.version,
+                "servers": spec.servers,
+                "description": spec.description
+                or "Mock API server generated from OpenAPI spec",
+                "endpoints": routes,
+                "scenario": scenario.name if scenario else "default",
+            }
+        )
 
     @app.route("/_apighost/health")
-    def _apighost_health():
-        return jsonify({"status": "ok", "endpoints": len(spec.endpoints), "recording": recorder is not None})
+    def _apighost_health() -> Any:
+        return jsonify(
+            {
+                "status": "ok",
+                "endpoints": len(spec.endpoints),
+                "recording": recorder is not None,
+            }
+        )
 
     # Register each endpoint
     for ep in spec.endpoints:
@@ -107,12 +127,7 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
         routes.append(route_info)
 
         def make_handler(endpoint: Endpoint, scenario: Scenario | None) -> Callable:
-            def handler(**path_params):
-                # Apply simulated latency if configured
-                if latency_range[1] > 0:
-                    delay = random.uniform(latency_range[0], latency_range[1])
-                    time.sleep(delay)
-
+            def handler(**path_params) -> Any:
                 # Capture request info for recording
                 req_method = request.method
                 req_path = request.path
@@ -140,6 +155,7 @@ def create_app(spec: ApiSpec, scenario: Scenario | None = None,
                     )
 
                 return _make_response(status, body)
+
             return handler
 
         app.add_url_rule(

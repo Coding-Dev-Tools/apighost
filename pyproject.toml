@@ -9,7 +9,7 @@ description = "CLI tool that reads an OpenAPI spec and spawns a realistic mock A
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 license = "MIT"
-authors = [{name = "Revenue Holdings"}]
+authors = [{name = "DevForge"}]
 keywords = ["openapi", "mock", "api", "vcr", "testing", "stub"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -35,9 +35,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "httpx>=0.27.0",
+ "pytest>=7.0.0",
+ "pytest-cov>=4.0.0",
+ "httpx>=0.27.0",
+ "ruff>=0.4.0",
 ]
 
 [project.urls]
@@ -50,9 +51,15 @@ Changelog = "https://github.com/Coding-Dev-Tools/apighost/releases"
 [project.scripts]
 apighost = "apighost.cli:cli"
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
@@ -66,4 +73,4 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 ignore = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["*"]
+known-first-party = ["apighost"]
