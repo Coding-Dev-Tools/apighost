@@ -6,7 +6,7 @@ from pathlib import Path
 
 from apighost.parser import _infer_type, get_param_pattern, parse_spec
 
-from . import PETSTORE_YAML
+from . import FIXTURES_DIR, PETSTORE_YAML
 
 
 def test_load_yaml():
@@ -29,6 +29,29 @@ def test_parse_endpoints():
     assert ("GET", "/pets/{petId}") in methods
     assert ("DELETE", "/pets/{petId}") in methods
     assert ("GET", "/pets/{petId}/photos") in methods
+
+
+def test_parse_xquik_openapi31_endpoint():
+    """Test parsing an OpenAPI 3.1 endpoint with API key security."""
+    spec = parse_spec(FIXTURES_DIR / "xquik-openapi31.yaml")
+
+    assert spec.title == "Xquik API"
+    assert spec.version == "1.0"
+    assert spec.servers == ["https://xquik.com"]
+    assert len(spec.endpoints) == 1
+
+    endpoint = spec.endpoints[0]
+    assert endpoint.operation_id == "searchTweets"
+    assert endpoint.method == "GET"
+    assert endpoint.path == "/api/v1/x/tweets/search"
+    assert endpoint.security == [{"apiKey": []}]
+    assert [param.name for param in endpoint.parameters] == ["q", "limit"]
+    assert endpoint.parameters[0].required is True
+    assert endpoint.parameters[0].schema_ref["type"] == "string"
+    assert endpoint.parameters[1].schema_ref["type"] == "integer"
+    assert 200 in endpoint.responses
+    response_schema = endpoint.responses[200].schema_ref
+    assert response_schema["properties"]["data"]["type"] == "array"
 
 
 def test_parse_endpoint_details():
