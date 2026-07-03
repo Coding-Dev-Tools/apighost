@@ -5,9 +5,13 @@ Covers uncovered paths and packaging config parity.
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
-import tomllib
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib  # type: ignore[import-not-found]
 from click.testing import CliRunner
 
 from apighost.cli import cli
@@ -32,11 +36,13 @@ class TestPackagingQuality:
         with open(pyproject, "rb") as f:
             data = tomllib.load(f)
         pkg_data = data.get("tool", {}).get("setuptools", {}).get("package-data", {})
-        assert "apighost" in pkg_data, (
-            "Expected [tool.setuptools.package-data] section for 'apighost'"
+        assert any(k in pkg_data for k in ("apighost", "*")), (
+            "Expected [tool.setuptools.package-data] section for 'apighost' or '*'"
         )
-        assert "py.typed" in pkg_data["apighost"], (
-            f"Expected 'py.typed' in package-data, got {pkg_data['apighost']}"
+        # The key may be "apighost" or "*" — check whichever exists
+        pkg_key = next(k for k in ("apighost", "*") if k in pkg_data)
+        assert "py.typed" in pkg_data[pkg_key], (
+            f"Expected 'py.typed' in package-data, got {pkg_data[pkg_key]}"
         )
 
     def test_ruff_known_first_party(self):
