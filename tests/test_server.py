@@ -185,7 +185,7 @@ def test_extract_path_params_no_match():
 
 
 def test_make_response_with_dict():
-    """_make_response with dict body returns jsonify tuple (covers line 37)."""
+    """_make_response with dict body returns jsonify Response (covers line 37)."""
     from flask import Flask
 
     from apighost.server import _make_response
@@ -193,8 +193,8 @@ def test_make_response_with_dict():
     app = Flask(__name__)
     with app.app_context():
         resp = _make_response(201, {"id": 1, "name": "test"})
-        assert resp[1] == 201
-        data = json.loads(resp[0].get_data(as_text=True))
+        assert resp.status_code == 201
+        data = json.loads(resp.get_data(as_text=True))
         assert data["name"] == "test"
 
 

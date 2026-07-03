@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import json
 import logging
+import random
 import re
+import time
 from collections.abc import Callable
 from typing import Any
 
@@ -126,6 +128,11 @@ def create_app(
 
         def make_handler(endpoint: Endpoint, scenario: Scenario | None) -> Callable:
             def handler(**path_params) -> Any:
+                # Apply latency if configured
+                if latency_range[1] > 0:
+                    delay = random.uniform(*latency_range)
+                    time.sleep(delay)
+
                 # Capture request info for recording
                 req_method = request.method
                 req_path = request.path
