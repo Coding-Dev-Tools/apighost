@@ -85,8 +85,5 @@ def load_scenario(name_or_path: str) -> Scenario:
 
 def delete_scenario(name: str) -> bool:
     """Delete a scenario by name."""
-    path = SCENARIO_DIR / f"{name}.json"
-    if path.exists():
-        path.unlink()
-        return True
-    return False
+    # Mirror save_scenario's filename sanitization and confirm the resolved path
+    # stays inside SCENARIO_DIR, so a cra
