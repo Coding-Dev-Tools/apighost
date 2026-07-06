@@ -22,8 +22,16 @@ Every frontend and integration test needs a mock API. Most teams either hardcode
 pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 ```
 
-**Package managers:**
-Homebrew, Scoop, and other distribution channels are planned but not yet published. Stay tuned.
+Or via the self-hosted PyPI index:
+```bash
+pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost
+```
+
+**Homebrew:**
+```bash
+brew tap Coding-Dev-Tools/homebrew-tap
+brew install apighost
+```
 
 ## Quick Start
 
