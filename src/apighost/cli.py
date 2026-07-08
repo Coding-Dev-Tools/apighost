@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import click
 import json
 import re
 import sys
@@ -374,7 +373,8 @@ def scenario_delete(name) -> None:
     "--output", "-o", default=None, help="Output path for the generated scenario"
 )
 @click.option("--name", "-n", default=None, help="Scenario name")
-def generate(spec, output, name) -> None:
+@click.option("--max-endpoints", "-m", type=int, default=0, help="Maximum number of endpoints to process (0 = all)")
+def generate(spec, output, name, max_endpoints) -> None:
     """Generate sample data and create a scenario from an OpenAPI spec."""
     api_spec = parse_spec(spec)
     scenario_name = name or f"generated-{api_spec.title.replace(' ', '-').lower()}"
