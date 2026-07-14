@@ -22,9 +22,9 @@ Every frontend and integration test needs a mock API. Most teams either hardcode
 pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 ```
 
-Or via the self-hosted PyPI index:
+Or via git+ from GitHub:
 ```bash
-pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost
+pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 ```
 
 **Homebrew:**
