@@ -22,27 +22,15 @@ def load_spec(path: str | Path) -> dict:
 
 
 def _resolve_ref(ref: str, spec: dict) -> dict:
-    """Resolve a local JSON Reference ($ref) within the spec.
-
-    Only in-document refs (starting with ``#/``) are supported; external
-    file/URL refs resolve to an empty schema rather than raising. JSON Pointer
-    escape sequences (``~1`` -> ``/``, ``~0`` -> ``~``) are decoded per RFC 6901.
-    """
-    if not isinstance(ref, str) or not ref.startswith("#/"):
-        return {}
-    current: Any = spec
-    for part in ref[2:].split("/"):
-        part = part.replace("~1", "/").replace("~0", "~")
-        if isinstance(current, dict) and part in current:
+    """Resolve a JSON Reference ($ref) within the spec."""
+    parts = ref.lstrip("#/").split("/")
+    current = spec
+    for part in parts:
+        if part in current:
             current = current[part]
-        elif isinstance(current, list):
-            try:
-                current = current[int(part)]
-            except (ValueError, IndexError):
-                return {}
         else:
             return {}
-    return current if isinstance(current, dict) else {}
+    return current
 
 
 def _infer_type(schema: dict) -> str:
@@ -54,36 +42,21 @@ def _infer_type(schema: dict) -> str:
     return schema.get("type", "string")
 
 
-def _resolve_schema_refs(
-    schema: dict | None, spec: dict, _seen: frozenset[str] = frozenset()
-) -> dict | None:
-    """Recursively resolve all $ref pointers in a schema tree.
-
-    Circular references (a schema that transitively references itself — common
-    for tree, comment-thread, and category/sub-category models) are detected via
-    ``_seen`` (the set of refs already resolved on the current path) and
-    truncated to an empty schema instead of recursing forever. Without this
-    guard a self-referential spec raised ``RecursionError`` and crashed parsing.
-    """
-    if not isinstance(schema, dict) or not schema:
+def _resolve_schema_refs(schema: dict | None, spec: dict) -> dict | None:
+    """Recursively resolve all $ref pointers in a schema tree."""
+    if not schema:
         return schema
-
-    # A schema that is (or contains) a $ref resolves to its target; per the
-    # OpenAPI 3.0 spec any sibling keys alongside $ref are ignored.
-    ref = schema.get("$ref")
-    if isinstance(ref, str):
-        if ref in _seen:
-            # Circular ref on this resolution path — stop expanding.
-            return {}
-        return _resolve_schema_refs(_resolve_ref(ref, spec), spec, _seen | {ref})
-
     resolved: dict[Any, Any] = {}
     for key, value in schema.items():
-        if isinstance(value, dict):
-            resolved[key] = _resolve_schema_refs(value, spec, _seen)
+        if key == "$ref" and isinstance(value, str):
+            ref_target = _resolve_ref(value, spec)
+            # Recursively resolve any refs within the resolved target
+            return _resolve_schema_refs(ref_target, spec)
+        elif isinstance(value, dict):
+            resolved[key] = _resolve_schema_refs(value, spec)
         elif isinstance(value, list):
             resolved[key] = [
-                _resolve_schema_refs(item, spec, _seen) if isinstance(item, dict) else item
+                _resolve_schema_refs(item, spec) if isinstance(item, dict) else item
                 for item in value
             ]
         else:
@@ -196,11 +169,7 @@ def parse_spec(path: str | Path) -> ApiSpec:
             if not operation:
                 continue
 
-            op_only = _parse_parameters(operation, path_pattern, raw)
-            # Per OpenAPI 3.x spec: operation params override path-level params with
-            # the same (name, in) key — deduplicate keeping the operation's version.
-            op_keys = {(p.name, p.location) for p in op_only}
-            op_params = [p for p in shared_params if (p.name, p.location) not in op_keys] + op_only
+            op_params = shared_params + _parse_parameters(operation, path_pattern, raw)
 
             endpoint = Endpoint(
                 path=path_pattern,
