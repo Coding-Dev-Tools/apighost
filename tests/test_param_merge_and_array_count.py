@@ -138,7 +138,9 @@ def test_operation_param_overrides_path_param(tmp_path):
     id_params = [p for p in ep.parameters if p.name == "id" and p.location == "path"]
     assert len(id_params) == 1, f"Expected exactly 1 'id' path param, got {len(id_params)}"
     # The operation-level version (required=True) must win
-    assert id_params[0].required is True, "Operation-level param (required=True) must override path-level (required=False)"
+    assert id_params[0].required is True, (
+        "Operation-level param (required=True) must override path-level (required=False)"
+    )
 
 
 def test_operation_adds_new_param_alongside_shared(tmp_path):
