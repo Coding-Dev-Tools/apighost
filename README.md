@@ -7,7 +7,7 @@
 > ⭐ **Star this repo** if you build or test APIs — it helps others discover APIGhost!
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/Coding-Dev-Tools/apighost)
-[![License](https://img.shields.io/github/license/Coding-Dev-Tools/apighost)](https://github.com/Coding-Dev-Tools/apighost/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/Coding-Dev-Tools/apighost)](https://github.com/Coding-Dev-Tools/apighost/blob/master/LICENSE)
 [![CI](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/apighost/actions/workflows/ci.yml)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/apighost)
 
@@ -18,14 +18,11 @@ Every frontend and integration test needs a mock API. Most teams either hardcode
 ## Installation
 
 **pip (Python):**
-```bash
+```
 pip install git+https://github.com/Coding-Dev-Tools/apighost.git
 ```
 
-Or via the self-hosted PyPI index:
-```bash
-pip install --index-url https://coding-dev-tools.github.io/pypi-index/simple/ apighost
-```
+> ⚠ **pip note:** apighost is not on public PyPI and the self-hosted index is currently unavailable. The `git+` form above is the only verified-working pip install path.
 
 **Homebrew:**
 ```bash
