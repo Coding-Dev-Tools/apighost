@@ -10,12 +10,9 @@ Covers two correctness bugs fixed in one commit:
 from __future__ import annotations
 
 import textwrap
-import yaml
-import pytest
 
-from apighost.parser import parse_spec
 from apighost.faker_utils import generate_value
-
+from apighost.parser import parse_spec
 
 # ---------------------------------------------------------------------------
 # Helpers

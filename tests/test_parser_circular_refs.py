@@ -9,6 +9,7 @@ and verify that legitimate (non-circular) refs still resolve fully.
 from __future__ import annotations
 
 import json
+
 from apighost.faker_utils import generate_value
 from apighost.parser import _resolve_ref, _resolve_schema_refs, parse_spec
 
