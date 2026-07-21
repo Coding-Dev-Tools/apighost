@@ -77,3 +77,6 @@ log_engraphis.py
 test_codex.py
 _audit_reqs.txt
 pr11_comment.md
+
+# npm lock artifact (Python-only project)
+package-lock.json
