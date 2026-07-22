@@ -140,7 +140,7 @@ apighost replay my-recording -p 8080            # Replay forever, same responses
 |------|-------|----------|
 | **Free** | $0 | Unlimited local use, 100 requests/session |
 | **Pro** | $12/mo ($119/yr) | Unlimited requests, VCR cassettes, CI/CD integration |
-| **Suite** | $49/mo ($39 billed annually) | All tools in the Coding-Dev-Tools ecosystem under one license |
+| **Suite** | $49/mo ($468/yr) | All tools in the Coding-Dev-Tools ecosystem under one license |
 
 ## Storage
 
