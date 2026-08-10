@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from .schema import Scenario
+from .vcr import _atomic_write_json
 
 SCENARIO_DIR = Path.home() / ".apighost" / "scenarios"
 
@@ -66,7 +67,7 @@ def save_scenario(
         "description": description,
         "overrides": overrides or {},
     }
-    path.write_text(json.dumps(data, indent=2))
+    _atomic_write_json(path, data)
     return str(path)
 
 

@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
+import os
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -15,6 +18,31 @@ def _ensure_dir() -> Path:
     """Ensure the cassette storage directory exists."""
     CASSETTE_DIR.mkdir(parents=True, exist_ok=True)
     return CASSETTE_DIR
+
+
+def _atomic_write_json(path: Path, data: dict) -> None:
+    """Write JSON to path atomically via tempfile + os.replace.
+
+    Prevents partial/corrupt files if the process is interrupted mid-write.
+    The temp file is created in the same directory as the target so that
+    os.replace() is guaranteed to be atomic on the same filesystem.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_path = tempfile.mkstemp(
+        suffix=".tmp", prefix=f".{path.stem}_", dir=str(path.parent)
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+            f.write("\n")
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, str(path))
+    except BaseException:
+        # Clean up temp file on any failure
+        with contextlib.suppress(OSError):
+            os.unlink(tmp_path)
+        raise
 
 
 def list_cassettes() -> list[dict]:
@@ -68,7 +96,7 @@ def save_cassette(
         ],
     }
 
-    path.write_text(json.dumps(data, indent=2))
+    _atomic_write_json(path, data)
     return str(path)
 
 
