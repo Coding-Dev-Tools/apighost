@@ -10,13 +10,10 @@ corruption on interrupted writes. The observable outcomes are:
 from __future__ import annotations
 
 import json
-import tempfile
 from pathlib import Path
 
-import pytest
-
-from apighost.vcr import CassetteInteraction, save_cassette
 from apighost.scenario import save_scenario
+from apighost.vcr import CassetteInteraction, save_cassette
 
 
 class TestSaveCassetteAtomic:
