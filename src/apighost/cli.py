@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import atexit
+import contextlib
 import json
 import re
+import signal
 import sys
 import threading
 import time
@@ -109,16 +112,43 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch) -> 
     click.echo(f"   Health: http://{host}:{port}/_apighost/health")
     click.echo("   Press Ctrl+C to stop\n")
 
+    # Save the cassette on ANY shutdown path. Previously only a clean
+    # KeyboardInterrupt triggered a save: SIGTERM (docker stop, kill, CI
+    # timeouts) killed the process and silently discarded the whole recording.
+    saved = {"done": False}
+
+    def _save_once() -> None:
+        if saved["done"]:
+            return
+        saved["done"] = True
+        _on_shutdown(recorder, name, spec)
+
+    # atexit fires on sys.exit (including from signal handlers) and on normal
+    # interpreter shutdown, so SIGTERM no longer discards the recording.
+    atexit.register(_save_once)
+
+    def _handle_signal(signum, frame) -> None:
+        sys.exit(0)
+
+    for sig_name in ("SIGTERM", "SIGINT", "SIGHUP"):
+        sig = getattr(signal, sig_name, None)
+        if sig is not None:
+            with contextlib.suppress(ValueError, OSError):
+                # signal() only works in the main thread
+                signal.signal(sig, _handle_signal)
+
     # Run with WSGI
     try:
         from werkzeug.serving import run_simple
 
         run_simple(host, port, app, use_reloader=False, threaded=True)
     except KeyboardInterrupt:
-        _on_shutdown(recorder, name, spec)
+        _save_once()
+    except SystemExit:
+        raise
     except Exception as e:
         click.echo(f" Server error: {e}", err=True)
-        _on_shutdown(recorder, name, spec)
+        _save_once()
 
 
 def _on_shutdown(recorder, cassette_name, spec_path) -> None:
@@ -206,6 +236,12 @@ def replay(cassette, port, host) -> Any:
     except FileNotFoundError as e:
         click.echo(f" Error: {e}", err=True)
         sys.exit(1)
+    except (ValueError, KeyError, TypeError) as e:
+        click.echo(
+            f" Error: cassette '{cassette}' is not a valid apighost cassette ({e}).",
+            err=True,
+        )
+        sys.exit(1)
 
     click.echo(f" APIGhost - replaying cassette: {cassette_data.name}")
     click.echo(f"   Interactions: {len(cassette_data.interactions)}")
@@ -290,6 +326,12 @@ def cassette_info(name) -> None:
         data = load_cassette(name)
     except FileNotFoundError as e:
         click.echo(f" Error: {e}", err=True)
+        sys.exit(1)
+    except (ValueError, KeyError, TypeError) as e:
+        click.echo(
+            f" Error: cassette '{name}' is not a valid apighost cassette ({e}).",
+            err=True,
+        )
         sys.exit(1)
 
     click.echo(f"Name: {data.name}")
