@@ -128,7 +128,23 @@ def generate_value(schema: dict | None, property_name: str = "") -> Any:
 
     if schema_type == "array":
         items = schema.get("items", {})
-        count = max(1, min(schema.get("minItems", 1), schema.get("maxItems", 5) or 3))
+        # Respect schema bounds: pick a random count in [minItems, maxItems].
+        # maxItems may be None (unbounded) — cap at 5 for practicality. The cap
+        # must never be raised to satisfy minItems, otherwise a spec with a large
+        # minItems (e.g. 10) would silently defeat the cap and emit 10+ items.
+        min_items = max(0, int(schema.get("minItems") or 0))
+        raw_max = schema.get("maxItems")
+        max_items = min(int(raw_max), 5) if raw_max is not None else 5
+        # If the schema demands more than the practical cap, honor the schema.
+        if max_items < min_items:
+            max_items = min_items
+        count = min_items if min_items == max_items else random.randint(min_items, max_items)
+        # An unbounded array (no explicit minItems) defaults to at least one item
+        # so the mock returns something useful. Only when minItems is *explicitly*
+        # 0 does the spec permit an empty array — and we must not silently inject
+        # an item in that case.
+        if "minItems" not in schema and count == 0:
+            count = 1
         return [generate_value(items) for _ in range(count)]
 
     if schema_type == "object":

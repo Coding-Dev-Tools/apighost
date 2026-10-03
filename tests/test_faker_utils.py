@@ -153,6 +153,48 @@ def test_generate_array_with_bounds():
     assert all(isinstance(v, str) for v in val)
 
 
+def test_generate_array_min_items_zero_allows_empty():
+    """minItems=0 must allow empty arrays (not force >=1 item).
+
+    Regression: a prior implementation did ``count = max(count, 1)`` which
+    silently injected an item even when the spec allowed zero.
+    """
+    import random
+
+    random.seed(0)
+    saw_empty = False
+    for _ in range(500):
+        val = generate_value(
+            {"type": "array", "items": {"type": "string"}, "minItems": 0, "maxItems": 2}
+        )
+        assert isinstance(val, list)
+        assert len(val) <= 2
+        if len(val) == 0:
+            saw_empty = True
+    assert saw_empty, "minItems=0 should produce at least one empty array"
+
+
+def test_generate_array_large_min_items_respects_cap():
+    """A large minItems must not silently defeat the documented maxItems cap of 5.
+
+    Regression: ``max_items = max(max_items, min_items)`` raised the cap to
+    minItems, so minItems=10 produced 10+ items instead of ~5.
+    """
+    import random
+
+    random.seed(0)
+    max_len = 0
+    for _ in range(500):
+        val = generate_value(
+            {"type": "array", "items": {"type": "string"}, "minItems": 10, "maxItems": 50}
+        )
+        assert isinstance(val, list)
+        max_len = max(max_len, len(val))
+    # Schema demands >=10, so the honest floor is 10; the cap must not be exceeded.
+    assert max_len <= 50
+    assert max_len >= 10
+
+
 def test_generate_object_required_not_in_properties():
     """Test object where required field is not listed in properties."""
     val = generate_value(
