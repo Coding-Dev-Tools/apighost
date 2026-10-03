@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import atexit
+import contextlib
 import json
 import re
+import signal
 import sys
 import threading
 import time
@@ -34,6 +37,71 @@ except ImportError:
 # Global recorder reference for signal handler
 _current_recorder: Recorder | None = None
 _current_server_thread = None
+
+
+class SpecReloader:
+    """Watches an OpenAPI spec file and rebuilds the mock app on change.
+
+    Used by ``serve --watch`` so editing the spec takes effect without
+    restarting the server. If a modified spec fails to parse, the previously
+    loaded app keeps serving and the error is reported instead of crashing.
+    """
+
+    def __init__(
+        self,
+        spec_path: str,
+        build_app: Any,
+        interval: float = 1.0,
+        clock: Any = time.monotonic,
+        stat: Any = None,
+    ) -> None:
+        self.spec_path = str(spec_path)
+        self._build_app = build_app
+        self.interval = interval
+        self._clock = clock
+        self._stat = stat or Path(self.spec_path).stat
+        self.app = build_app()
+        self.last_poll = self._clock()
+        try:
+            self._mtime: float | None = self._stat().st_mtime
+        except OSError:
+            self._mtime = None
+
+    def poll(self) -> bool:
+        """Check the spec once; rebuild the app if its mtime changed.
+
+        Returns True when the app was rebuilt, False otherwise.
+        """
+        now = self._clock()
+        if now - self.last_poll < self.interval:
+            return False
+        self.last_poll = now
+        try:
+            mtime = self._stat().st_mtime
+        except OSError as e:
+            click.echo(f" Watch: cannot stat spec ({e}) - keeping current app", err=True)
+            return False
+        if mtime == self._mtime:
+            return False
+        self._mtime = mtime
+        try:
+            self.app = self._build_app()
+        except Exception as e:
+            click.echo(
+                f" Watch: spec changed but failed to load ({e}) - keeping previous version",
+                err=True,
+            )
+            return False
+        click.echo(" Watch: spec changed - app reloaded", err=True)
+        return True
+
+    def loop_forever(self) -> None:
+        while True:
+            self.poll()
+            time.sleep(min(self.interval, 0.5))
+
+
+
 
 
 @click.group()
@@ -102,12 +170,63 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch) -> 
     # Latency
     latency_range = (latency, latency) if latency > 0 else (0, 0)
 
-    # Create the Flask app
-    app = create_app(api_spec, scenario_obj, recorder, latency_range)
+    # Create the Flask app (--watch swaps in a rebuilt app on spec changes)
+    def _build_app() -> Any:
+        # Re-parse from disk every time: --watch exists so edits to the spec
+        # file are picked up, so a cached parse would make watch useless.
+        fresh_spec = parse_spec(spec)
+        current_scenario = None
+        if scenario:
+            try:
+                current_scenario = load_scenario(scenario)
+            except FileNotFoundError:
+                current_scenario = None
+        return create_app(fresh_spec, current_scenario, recorder, latency_range)
+
+    watcher: SpecReloader | None = None
+    if watch:
+        watcher = SpecReloader(spec, _build_app)
+
+        def _dispatch(environ, start_response):  # type: ignore[no-untyped-def]
+            # Read through the reloader each request so a rebuilt app is
+            # actually served, not the snapshot from startup.
+            return watcher.app(environ, start_response)
+
+        app: Any = _dispatch
+        threading.Thread(target=watcher.loop_forever, daemon=True).start()
+        click.echo("   Watch enabled: spec changes are picked up automatically")
+    else:
+        app = create_app(api_spec, scenario_obj, recorder, latency_range)
+
 
     click.echo(f"\n Mock server running at http://{host}:{port}")
     click.echo(f"   Health: http://{host}:{port}/_apighost/health")
     click.echo("   Press Ctrl+C to stop\n")
+
+    # Save the cassette on ANY shutdown path. Previously only a clean
+    # KeyboardInterrupt triggered a save: SIGTERM (docker stop, kill, CI
+    # timeouts) killed the process and silently discarded the whole recording.
+    saved = {"done": False}
+
+    def _save_once() -> None:
+        if saved["done"]:
+            return
+        saved["done"] = True
+        _on_shutdown(recorder, name, spec)
+
+    # atexit fires on sys.exit (including from signal handlers) and on normal
+    # interpreter shutdown, so SIGTERM no longer discards the recording.
+    atexit.register(_save_once)
+
+    def _handle_signal(signum, frame) -> None:
+        sys.exit(0)
+
+    for sig_name in ("SIGTERM", "SIGINT", "SIGHUP"):
+        sig = getattr(signal, sig_name, None)
+        if sig is not None:
+            with contextlib.suppress(ValueError, OSError):
+                # signal() only works in the main thread
+                signal.signal(sig, _handle_signal)
 
     # Run with WSGI
     try:
@@ -115,10 +234,12 @@ def serve(spec, port, host, scenario, record, cassette_name, latency, watch) -> 
 
         run_simple(host, port, app, use_reloader=False, threaded=True)
     except KeyboardInterrupt:
-        _on_shutdown(recorder, name, spec)
+        _save_once()
+    except SystemExit:
+        raise
     except Exception as e:
         click.echo(f" Server error: {e}", err=True)
-        _on_shutdown(recorder, name, spec)
+        _save_once()
 
 
 def _on_shutdown(recorder, cassette_name, spec_path) -> None:
@@ -206,6 +327,12 @@ def replay(cassette, port, host) -> Any:
     except FileNotFoundError as e:
         click.echo(f" Error: {e}", err=True)
         sys.exit(1)
+    except (ValueError, KeyError, TypeError) as e:
+        click.echo(
+            f" Error: cassette '{cassette}' is not a valid apighost cassette ({e}).",
+            err=True,
+        )
+        sys.exit(1)
 
     click.echo(f" APIGhost - replaying cassette: {cassette_data.name}")
     click.echo(f"   Interactions: {len(cassette_data.interactions)}")
@@ -290,6 +417,12 @@ def cassette_info(name) -> None:
         data = load_cassette(name)
     except FileNotFoundError as e:
         click.echo(f" Error: {e}", err=True)
+        sys.exit(1)
+    except (ValueError, KeyError, TypeError) as e:
+        click.echo(
+            f" Error: cassette '{name}' is not a valid apighost cassette ({e}).",
+            err=True,
+        )
         sys.exit(1)
 
     click.echo(f"Name: {data.name}")

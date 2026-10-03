@@ -13,12 +13,23 @@ from .schema import ApiSpec, Endpoint, Parameter, Response
 
 
 def load_spec(path: str | Path) -> dict:
-    """Load an OpenAPI spec from a YAML or JSON file."""
+    """Load an OpenAPI spec from a YAML or JSON file.
+
+    Raises FileNotFoundError for missing files and ValueError with the
+    filename for malformed YAML/JSON, giving users actionable context
+    instead of raw parser tracebacks.
+    """
     path = Path(path)
     raw = path.read_text(encoding="utf-8")
     if path.suffix.lower() in (".yaml", ".yml"):
-        return yaml.safe_load(raw)
-    return json.loads(raw)
+        try:
+            return yaml.safe_load(raw)
+        except yaml.YAMLError as exc:
+            raise ValueError(f"Malformed YAML in {path}: {exc}") from exc
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Malformed JSON in {path}: {exc}") from exc
 
 
 def _resolve_ref(ref: str, spec: dict) -> dict:
