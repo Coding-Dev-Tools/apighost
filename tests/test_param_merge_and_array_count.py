@@ -10,16 +10,14 @@ Covers two correctness bugs fixed in one commit:
 from __future__ import annotations
 
 import textwrap
-import yaml
-import pytest
 
-from apighost.parser import parse_spec
 from apighost.faker_utils import generate_value
-
+from apighost.parser import parse_spec
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _parse_yaml(text: str, tmp_path):
     p = tmp_path / "spec.yaml"
@@ -141,7 +139,9 @@ def test_operation_param_overrides_path_param(tmp_path):
     id_params = [p for p in ep.parameters if p.name == "id" and p.location == "path"]
     assert len(id_params) == 1, f"Expected exactly 1 'id' path param, got {len(id_params)}"
     # The operation-level version (required=True) must win
-    assert id_params[0].required is True, "Operation-level param (required=True) must override path-level (required=False)"
+    assert id_params[0].required is True, (
+        "Operation-level param (required=True) must override path-level (required=False)"
+    )
 
 
 def test_operation_adds_new_param_alongside_shared(tmp_path):
@@ -165,6 +165,7 @@ def test_no_path_params_no_duplication(tmp_path):
 # ---------------------------------------------------------------------------
 # 2. Array count: random within [minItems, maxItems]
 # ---------------------------------------------------------------------------
+
 
 def test_array_respects_exact_count():
     """minItems == maxItems -> always that exact count."""

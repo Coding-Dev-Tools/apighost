@@ -9,6 +9,9 @@ and verify that legitimate (non-circular) refs still resolve fully.
 from __future__ import annotations
 
 import json
+
+import pytest
+
 from apighost.faker_utils import generate_value
 from apighost.parser import _resolve_ref, _resolve_schema_refs, parse_spec
 
@@ -29,9 +32,7 @@ def _spec(schemas: dict, response_ref: str) -> dict:
                     "responses": {
                         "200": {
                             "description": "ok",
-                            "content": {
-                                "application/json": {"schema": {"$ref": response_ref}}
-                            },
+                            "content": {"application/json": {"schema": {"$ref": response_ref}}},
                         }
                     }
                 }
@@ -108,6 +109,18 @@ def test_resolve_ref_decodes_json_pointer_escapes():
     spec = {"paths": {"/a/b": {"note": "hit"}}}
     # ~1 decodes to '/', so this points at the "/a/b" key.
     assert _resolve_ref("#/paths/~1a~1b", spec) == {"note": "hit"}
+
+
+@pytest.mark.parametrize("index", ["-1", "+0", "00", "01", " 0", "\u0660"])
+def test_resolve_ref_rejects_noncanonical_array_indices(index):
+    spec = {"schemas": [{"type": "string"}, {"type": "integer"}]}
+    assert _resolve_ref(f"#/schemas/{index}", spec) == {}
+
+
+def test_resolve_ref_accepts_array_indices_and_literal_mapping_keys():
+    spec = {"schemas": [{"type": "string"}], "mapping": {"-1": {"type": "boolean"}}}
+    assert _resolve_ref("#/schemas/0", spec) == {"type": "string"}
+    assert _resolve_ref("#/mapping/-1", spec) == {"type": "boolean"}
 
 
 def test_resolve_schema_refs_tolerates_non_dict_input():
