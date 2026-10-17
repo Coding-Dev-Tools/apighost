@@ -47,6 +47,11 @@ def _resolve_ref(ref: str, spec: dict) -> dict:
         if isinstance(current, dict) and part in current:
             current = current[part]
         elif isinstance(current, list):
+            # RFC 6901 array indices are canonical unsigned ASCII integers.
+            # Python's int() also accepts -1, +0, whitespace and Unicode digits,
+            # which would silently resolve an invalid pointer to another schema.
+            if re.fullmatch(r"0|[1-9][0-9]*", part) is None:
+                return {}
             try:
                 current = current[int(part)]
             except (ValueError, IndexError):
