@@ -111,9 +111,7 @@ class TestGenerate:
 
     def test_cli_generate_with_name(self, runner):
         """Test 'apighost generate' with custom name."""
-        result = runner.invoke(
-            cli, ["generate", PETSTORE_YAML, "-n", "my-gen-scenario"]
-        )
+        result = runner.invoke(cli, ["generate", PETSTORE_YAML, "-n", "my-gen-scenario"])
         assert result.exit_code == 0
         assert "my-gen-scenario" in result.output
 
@@ -151,9 +149,7 @@ class TestScenario:
 
     def test_cli_scenario_create(self, runner):
         """Test 'apighost scenario create'."""
-        result = runner.invoke(
-            cli, ["scenario", "create", self.SCENARIO_NAME, "-d", "CLI test"]
-        )
+        result = runner.invoke(cli, ["scenario", "create", self.SCENARIO_NAME, "-d", "CLI test"])
         assert result.exit_code == 0
         assert self.SCENARIO_NAME in result.output
 
@@ -285,11 +281,7 @@ class TestGenerateMaxEndpoints:
         # Petstore fixture has 5 endpoints, all should be listed
         lines = [line.strip() for line in result.output.split("\n") if line.strip()]
         endpoint_lines = [
-            line
-            for line in lines
-            if line.startswith("GET")
-            or line.startswith("POST")
-            or line.startswith("DELETE")
+            line for line in lines if line.startswith("GET") or line.startswith("POST") or line.startswith("DELETE")
         ]
         assert len(endpoint_lines) == 5
         assert "5 endpoint responses" in result.output
@@ -300,11 +292,7 @@ class TestGenerateMaxEndpoints:
         assert result.exit_code == 0
         lines = [line.strip() for line in result.output.split("\n") if line.strip()]
         endpoint_lines = [
-            line
-            for line in lines
-            if line.startswith("GET")
-            or line.startswith("POST")
-            or line.startswith("DELETE")
+            line for line in lines if line.startswith("GET") or line.startswith("POST") or line.startswith("DELETE")
         ]
         assert len(endpoint_lines) == 2
         assert "2 endpoint responses" in result.output
@@ -375,9 +363,7 @@ class TestScenarioEditRawBody:
 
     def test_cli_scenario_edit_raw_string_body(self, runner):
         """Test editing scenario with a raw string body (not JSON)."""
-        runner.invoke(
-            cli, ["scenario", "create", self.SCENARIO_NAME, "-d", "Raw body test"]
-        )
+        runner.invoke(cli, ["scenario", "create", self.SCENARIO_NAME, "-d", "Raw body test"])
         result = runner.invoke(
             cli,
             [
@@ -447,12 +433,8 @@ class TestInfoWithData:
         assert "APIGhost" in result.output
 
         # Cleanup
-        cassette_path = (
-            Path.home() / ".apighost" / "cassettes" / "info-test-cassette.json"
-        )
-        scenario_path = (
-            Path.home() / ".apighost" / "scenarios" / "info-test-scenario.json"
-        )
+        cassette_path = Path.home() / ".apighost" / "cassettes" / "info-test-cassette.json"
+        scenario_path = Path.home() / ".apighost" / "scenarios" / "info-test-scenario.json"
         cassette_path.unlink(missing_ok=True)
         scenario_path.unlink(missing_ok=True)
 

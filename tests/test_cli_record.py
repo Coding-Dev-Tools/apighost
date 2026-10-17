@@ -41,9 +41,7 @@ class TestRecordCommand:
     @patch("apighost.cli.http_requests")
     @patch("apighost.cli.threading.Thread")
     @patch("apighost.cli.time.sleep")
-    def test_record_makes_requests_and_saves(
-        self, mock_sleep, mock_thread_cls, mock_http, runner
-    ):
+    def test_record_makes_requests_and_saves(self, mock_sleep, mock_thread_cls, mock_http, runner):
         """Record parses spec, starts server, makes requests, saves cassette."""
         # Simulate successful HTTP responses
         mock_resp = MagicMock()
@@ -54,9 +52,7 @@ class TestRecordCommand:
         mock_thread = MagicMock()
         mock_thread_cls.return_value = mock_thread
 
-        result = runner.invoke(
-            cli, ["record", PETSTORE_YAML, "-o", "record-test-named", "-n", "2"]
-        )
+        result = runner.invoke(cli, ["record", PETSTORE_YAML, "-o", "record-test-named", "-n", "2"])
         assert result.exit_code == 0
         assert "Recording server" in result.output
         assert "Making up to 2 sample requests" in result.output
@@ -69,9 +65,7 @@ class TestRecordCommand:
     @patch("apighost.cli.http_requests")
     @patch("apighost.cli.threading.Thread")
     @patch("apighost.cli.time.sleep")
-    def test_record_handles_request_errors(
-        self, mock_sleep, mock_thread_cls, mock_http, runner
-    ):
+    def test_record_handles_request_errors(self, mock_sleep, mock_thread_cls, mock_http, runner):
         """Record continues when individual requests fail."""
         # First call raises, second succeeds
         mock_resp = MagicMock()
@@ -81,9 +75,7 @@ class TestRecordCommand:
         mock_thread = MagicMock()
         mock_thread_cls.return_value = mock_thread
 
-        result = runner.invoke(
-            cli, ["record", PETSTORE_YAML, "-o", "record-test-named", "-n", "5"]
-        )
+        result = runner.invoke(cli, ["record", PETSTORE_YAML, "-o", "record-test-named", "-n", "5"])
         assert result.exit_code == 0
         assert "ERROR" in result.output
         # Should still save cassette with the successful interaction
@@ -92,9 +84,7 @@ class TestRecordCommand:
     @patch("apighost.cli.http_requests")
     @patch("apighost.cli.threading.Thread")
     @patch("apighost.cli.time.sleep")
-    def test_record_respects_request_limit(
-        self, mock_sleep, mock_thread_cls, mock_http, runner
-    ):
+    def test_record_respects_request_limit(self, mock_sleep, mock_thread_cls, mock_http, runner):
         """Record stops after -n requests even if more endpoints exist."""
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -104,9 +94,7 @@ class TestRecordCommand:
         mock_thread_cls.return_value = mock_thread
 
         # Petstore has 5 endpoints; limit to 1
-        result = runner.invoke(
-            cli, ["record", PETSTORE_YAML, "-o", "record-test-limit1", "-n", "1"]
-        )
+        result = runner.invoke(cli, ["record", PETSTORE_YAML, "-o", "record-test-limit1", "-n", "1"])
         assert result.exit_code == 0
         # Should make exactly 1 request
         assert mock_http.request.call_count == 1
@@ -114,9 +102,7 @@ class TestRecordCommand:
     @patch("apighost.cli.http_requests")
     @patch("apighost.cli.threading.Thread")
     @patch("apighost.cli.time.sleep")
-    def test_record_auto_output_name(
-        self, mock_sleep, mock_thread_cls, mock_http, runner
-    ):
+    def test_record_auto_output_name(self, mock_sleep, mock_thread_cls, mock_http, runner):
         """Record generates output name from spec title when -o not given."""
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -161,9 +147,7 @@ class TestRecordCommand:
     @patch("apighost.cli.http_requests")
     @patch("apighost.cli.threading.Thread")
     @patch("apighost.cli.time.sleep")
-    def test_record_fills_path_params(
-        self, mock_sleep, mock_thread_cls, mock_http, runner
-    ):
+    def test_record_fills_path_params(self, mock_sleep, mock_thread_cls, mock_http, runner):
         """Record fills path parameters like {petId} with fake values."""
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -172,9 +156,7 @@ class TestRecordCommand:
         mock_thread = MagicMock()
         mock_thread_cls.return_value = mock_thread
 
-        result = runner.invoke(
-            cli, ["record", PETSTORE_YAML, "-o", "record-test-named", "-n", "5"]
-        )
+        result = runner.invoke(cli, ["record", PETSTORE_YAML, "-o", "record-test-named", "-n", "5"])
         assert result.exit_code == 0
         # Petstore has endpoints with {petId} — verify requests used numeric fill
         calls = mock_http.request.call_args_list
@@ -228,9 +210,7 @@ class TestReplayRouteHandlers:
             assert "GET /pets" in data["endpoints"]
 
         # Cleanup
-        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(
-            missing_ok=True
-        )
+        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(missing_ok=True)
 
     @patch("werkzeug.serving.run_simple")
     def test_replay_handler_match(self, mock_run, runner):
@@ -263,9 +243,7 @@ class TestReplayRouteHandlers:
             data = resp.get_json()
             assert data == {"pets": ["cat"]}
 
-        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(
-            missing_ok=True
-        )
+        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(missing_ok=True)
 
     @patch("werkzeug.serving.run_simple")
     def test_replay_handler_no_match(self, mock_run, runner):
@@ -298,9 +276,7 @@ class TestReplayRouteHandlers:
             data = resp.get_json()
             assert "No matching recorded interaction" in data["error"]
 
-        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(
-            missing_ok=True
-        )
+        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(missing_ok=True)
 
     @patch("werkzeug.serving.run_simple")
     def test_replay_handler_method_mismatch(self, mock_run, runner):
@@ -332,9 +308,7 @@ class TestReplayRouteHandlers:
             resp = client.post("/pets")
             assert resp.status_code == 404
 
-        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(
-            missing_ok=True
-        )
+        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(missing_ok=True)
 
     @patch("werkzeug.serving.run_simple")
     def test_replay_handler_no_headers_fallback(self, mock_run, runner):
@@ -366,6 +340,4 @@ class TestReplayRouteHandlers:
             assert resp.status_code == 201
             assert resp.content_type == "application/json"
 
-        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(
-            missing_ok=True
-        )
+        Path.home().joinpath(".apighost/cassettes/replay-route-test.json").unlink(missing_ok=True)

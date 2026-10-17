@@ -93,8 +93,13 @@ def test_poll_keeps_old_app_when_new_spec_is_broken(spec_file: Path) -> None:
 def test_poll_survives_missing_spec_file(spec_file: Path, tmp_path: Path) -> None:
     gone = tmp_path / "deleted.yaml"
     clock = _FakeClock()
-    r = SpecReloader(str(gone), lambda: object(), interval=0.0, clock=clock,
-                     stat=lambda: (_ for _ in ()).throw(FileNotFoundError("gone")))
+    r = SpecReloader(
+        str(gone),
+        lambda: object(),
+        interval=0.0,
+        clock=clock,
+        stat=lambda: (_ for _ in ()).throw(FileNotFoundError("gone")),
+    )
     clock.now += 10
     assert r.poll() is False
 
