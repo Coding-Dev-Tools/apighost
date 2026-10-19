@@ -145,9 +145,7 @@ def test_generate_number():
 
 def test_generate_array_with_bounds():
     """Test array with minItems/maxItems constraints."""
-    val = generate_value(
-        {"type": "array", "items": {"type": "string"}, "minItems": 2, "maxItems": 4}
-    )
+    val = generate_value({"type": "array", "items": {"type": "string"}, "minItems": 2, "maxItems": 4})
     assert isinstance(val, list)
     assert 2 <= len(val) <= 4
     assert all(isinstance(v, str) for v in val)
@@ -164,9 +162,7 @@ def test_generate_array_min_items_zero_allows_empty():
     random.seed(0)
     saw_empty = False
     for _ in range(500):
-        val = generate_value(
-            {"type": "array", "items": {"type": "string"}, "minItems": 0, "maxItems": 2}
-        )
+        val = generate_value({"type": "array", "items": {"type": "string"}, "minItems": 0, "maxItems": 2})
         assert isinstance(val, list)
         assert len(val) <= 2
         if len(val) == 0:
@@ -185,9 +181,7 @@ def test_generate_array_large_min_items_respects_cap():
     random.seed(0)
     max_len = 0
     for _ in range(500):
-        val = generate_value(
-            {"type": "array", "items": {"type": "string"}, "minItems": 10, "maxItems": 50}
-        )
+        val = generate_value({"type": "array", "items": {"type": "string"}, "minItems": 10, "maxItems": 50})
         assert isinstance(val, list)
         max_len = max(max_len, len(val))
     # Schema demands >=10, so the honest floor is 10; the cap must not be exceeded.

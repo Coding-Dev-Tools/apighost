@@ -5,6 +5,7 @@ upstream tag silently changes what CI runs. Every action reference in
 .github/workflows/*.yml must use a 40-char commit SHA (optionally followed by
 an inline comment documenting the version).
 """
+
 from __future__ import annotations
 
 import re
@@ -40,13 +41,10 @@ def test_all_actions_are_sha_pinned(workflow: Path) -> None:
         if not line.startswith("uses:"):
             continue
         # Strip the 'uses:' prefix and any inline comment outside the ref
-        value = line[len("uses:"):].strip()
+        value = line[len("uses:") :].strip()
         # Skip exempt org-internal reusable workflows
         if any(value.startswith(pfx) for pfx in EXEMPT_PREFIXES):
             continue
         if not SHA_PIN_RE.search(value):
             violations.append(f"{workflow.name}:{lineno}: {raw_line.strip()}")
-    assert not violations, (
-        "Mutable action references found — pin to a 40-char commit SHA:\n"
-        + "\n".join(violations)
-    )
+    assert not violations, "Mutable action references found — pin to a 40-char commit SHA:\n" + "\n".join(violations)

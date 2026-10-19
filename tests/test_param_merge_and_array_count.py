@@ -18,6 +18,7 @@ from apighost.parser import parse_spec
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _parse_yaml(text: str, tmp_path):
     p = tmp_path / "spec.yaml"
     p.write_text(textwrap.dedent(text))
@@ -164,6 +165,7 @@ def test_no_path_params_no_duplication(tmp_path):
 # ---------------------------------------------------------------------------
 # 2. Array count: random within [minItems, maxItems]
 # ---------------------------------------------------------------------------
+
 
 def test_array_respects_exact_count():
     """minItems == maxItems -> always that exact count."""

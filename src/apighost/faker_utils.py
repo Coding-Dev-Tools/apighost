@@ -57,9 +57,7 @@ PROPERTY_HINTS: dict[str, Callable[[], Any]] = {
     "type": lambda: random.choice(["user", "admin", "moderator", "guest"]),
     "role": lambda: random.choice(["admin", "editor", "viewer", "contributor"]),
     "slug": lambda: _faker.slug(),
-    "avatar": lambda: (
-        f"https://api.dicebear.com/7.x/avataaars/svg?seed={_faker.user_name()}"
-    ),
+    "avatar": lambda: f"https://api.dicebear.com/7.x/avataaars/svg?seed={_faker.user_name()}",
     "image": lambda: f"https://picsum.photos/seed/{_faker.random_int()}/400/300",
     "url": lambda: _faker.url(),
     "website": lambda: _faker.url(),
@@ -108,9 +106,7 @@ def generate_value(schema: dict | None, property_name: str = "") -> Any:
 
     if schema_type == "string":
         if "minLength" in schema and "maxLength" in schema:
-            return _faker.pystr(
-                min_chars=schema["minLength"], max_chars=schema["maxLength"]
-            )
+            return _faker.pystr(min_chars=schema["minLength"], max_chars=schema["maxLength"])
         if schema.get("pattern"):
             return _faker.pystr(min_chars=8, max_chars=16)
         return _faker.word()

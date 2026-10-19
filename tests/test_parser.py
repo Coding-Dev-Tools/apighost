@@ -124,10 +124,7 @@ def test_parse_json_spec():
 def test_get_param_pattern():
     """Test path parameter conversion for Flask."""
     assert get_param_pattern("/users/{id}") == "/users/<id>"
-    assert (
-        get_param_pattern("/users/{userId}/posts/{postId}")
-        == "/users/<userId>/posts/<postId>"
-    )
+    assert get_param_pattern("/users/{userId}/posts/{postId}") == "/users/<userId>/posts/<postId>"
     assert get_param_pattern("/items") == "/items"
 
 

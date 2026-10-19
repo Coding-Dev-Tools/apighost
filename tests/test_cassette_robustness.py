@@ -1,7 +1,5 @@
 """Tests for cassette robustness: corrupt-cassette errors and shutdown-save wiring."""
 
-
-
 from click.testing import CliRunner
 
 from apighost.cli import cli

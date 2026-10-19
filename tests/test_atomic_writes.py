@@ -34,6 +34,7 @@ class TestSaveCassetteAtomic:
         ]
         # Monkeypatch CASSETTE_DIR to tmp_path so we don't pollute real dir
         import apighost.vcr as vcr_module
+
         original_dir = vcr_module.CASSETTE_DIR
         vcr_module.CASSETTE_DIR = tmp_path
         try:
@@ -62,6 +63,7 @@ class TestSaveCassetteAtomic:
             )
         ]
         import apighost.vcr as vcr_module
+
         original_dir = vcr_module.CASSETTE_DIR
         vcr_module.CASSETTE_DIR = tmp_path
         try:
@@ -80,9 +82,7 @@ class TestSaveScenarioAtomic:
 
     def test_save_scenario_produces_valid_json(self, tmp_path: Path) -> None:
         """Saved scenario must be parseable JSON with expected structure."""
-        overrides = {
-            "GET /api/health": {"status": 503, "body": {"error": "unavailable"}}
-        }
+        overrides = {"GET /api/health": {"status": 503, "body": {"error": "unavailable"}}}
         output_path = tmp_path / "custom-scenario.json"
         result_path = save_scenario(
             name="atomic-scenario",
@@ -115,6 +115,7 @@ class TestSaveScenarioAtomic:
     def test_save_scenario_default_dir_no_temp_files(self, tmp_path: Path) -> None:
         """When using default SCENARIO_DIR, no temp files should remain."""
         import apighost.scenario as scenario_module
+
         original_dir = scenario_module.SCENARIO_DIR
         scenario_module.SCENARIO_DIR = tmp_path
         try:

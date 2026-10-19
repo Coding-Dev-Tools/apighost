@@ -41,19 +41,13 @@ class TestPackagingQuality:
         )
         # The key may be "apighost" or "*" — check whichever exists
         pkg_key = next(k for k in ("apighost", "*") if k in pkg_data)
-        assert "py.typed" in pkg_data[pkg_key], (
-            f"Expected 'py.typed' in package-data, got {pkg_data[pkg_key]}"
-        )
+        assert "py.typed" in pkg_data[pkg_key], f"Expected 'py.typed' in package-data, got {pkg_data[pkg_key]}"
 
     def test_ruff_known_first_party(self):
         """ruff known-first-party should be ['apighost'], not ['*']."""
         pyproject = Path(__file__).parent.parent / "pyproject.toml"
         with open(pyproject, "rb") as f:
             data = tomllib.load(f)
-        isort_cfg = (
-            data.get("tool", {}).get("ruff", {}).get("lint", {}).get("isort", {})
-        )
+        isort_cfg = data.get("tool", {}).get("ruff", {}).get("lint", {}).get("isort", {})
         kfp = isort_cfg.get("known-first-party", [])
-        assert kfp == ["apighost"], (
-            f"known-first-party should be ['apighost'], got {kfp}"
-        )
+        assert kfp == ["apighost"], f"known-first-party should be ['apighost'], got {kfp}"

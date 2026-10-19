@@ -28,9 +28,7 @@ def _atomic_write_json(path: Path, data: dict) -> None:
     os.replace() is guaranteed to be atomic on the same filesystem.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp_path = tempfile.mkstemp(
-        suffix=".tmp", prefix=f".{path.stem}_", dir=str(path.parent)
-    )
+    fd, tmp_path = tempfile.mkstemp(suffix=".tmp", prefix=f".{path.stem}_", dir=str(path.parent))
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
@@ -66,9 +64,7 @@ def list_cassettes() -> list[dict]:
     return cassettes
 
 
-def save_cassette(
-    name: str, interactions: list[CassetteInteraction], spec_path: str = ""
-) -> str:
+def save_cassette(name: str, interactions: list[CassetteInteraction], spec_path: str = "") -> str:
     """Save recorded interactions to a cassette file."""
     _ensure_dir()
     safe_name = name.replace(" ", "_").replace("/", "-")

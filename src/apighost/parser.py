@@ -47,6 +47,11 @@ def _resolve_ref(ref: str, spec: dict) -> dict:
         if isinstance(current, dict) and part in current:
             current = current[part]
         elif isinstance(current, list):
+            # RFC 6901 array indices are canonical unsigned ASCII integers.
+            # Python's int() also accepts -1, +0, whitespace and Unicode digits,
+            # which would silently resolve an invalid pointer to another schema.
+            if re.fullmatch(r"0|[1-9][0-9]*", part) is None:
+                return {}
             try:
                 current = current[int(part)]
             except (ValueError, IndexError):
@@ -65,9 +70,7 @@ def _infer_type(schema: dict) -> str:
     return schema.get("type", "string")
 
 
-def _resolve_schema_refs(
-    schema: dict | None, spec: dict, _seen: frozenset[str] = frozenset()
-) -> dict | None:
+def _resolve_schema_refs(schema: dict | None, spec: dict, _seen: frozenset[str] = frozenset()) -> dict | None:
     """Recursively resolve all $ref pointers in a schema tree.
 
     Circular references (a schema that transitively references itself — common
@@ -94,8 +97,7 @@ def _resolve_schema_refs(
             resolved[key] = _resolve_schema_refs(value, spec, _seen)
         elif isinstance(value, list):
             resolved[key] = [
-                _resolve_schema_refs(item, spec, _seen) if isinstance(item, dict) else item
-                for item in value
+                _resolve_schema_refs(item, spec, _seen) if isinstance(item, dict) else item for item in value
             ]
         else:
             resolved[key] = value
@@ -120,8 +122,7 @@ def _parse_parameters(path_item: dict, path: str, spec: dict) -> list[Parameter]
                     location=resolved.get("in", "query"),
                     required=resolved.get("required", False),
                     schema_ref=resolved.get("schema", {}),
-                    example=resolved.get("example")
-                    or resolved.get("schema", {}).get("example"),
+                    example=resolved.get("example") or resolved.get("schema", {}).get("example"),
                 )
             )
 
@@ -234,9 +235,7 @@ def parse_spec(path: str | Path) -> ApiSpec:
                 content = rb.get("content", {})
                 if content:
                     content_type = list(content.keys())[0]
-                    endpoint.request_body_schema = _resolve_schema_refs(
-                        content[content_type].get("schema", {}), raw
-                    )
+                    endpoint.request_body_schema = _resolve_schema_refs(content[content_type].get("schema", {}), raw)
 
             spec.endpoints.append(endpoint)
 
